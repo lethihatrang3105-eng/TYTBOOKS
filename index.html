@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYTBOOKS - Thế Giới Sách Của Bạn</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="top-auth-bar" style="background: #f1f1f1; border-bottom: 1px solid #e5e5e5; padding: 6px 0;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; padding: 0 20px; gap: 20px; font-size: 13px;">
+            <span id="user-greeting" style="display: none; color: #f26522; font-weight: bold;"></span>
+            <a href="#" id="btn-show-login" onclick="document.getElementById('authModal').style.display='block'; showLoginForm(); return false;" style="color: #555; text-decoration: none;">👤 Đăng nhập</a>
+            <a href="#" id="btn-show-register" onclick="document.getElementById('authModal').style.display='block'; showRegisterForm(); return false;" style="color: #555; text-decoration: none;">Đăng ký</a>
+            <a href="#" id="btn-logout" onclick="logoutUser()" style="display: none; color: #555; text-decoration: none;">Đăng xuất</a>
+        </div>
+    </div>
+    <header class="header" style="background: #fff; border-bottom: 1px solid #eaeaea; padding: 15px 0;">
+        <div class="header-container" style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+            <div class="logo">
+                <h1 style="margin: 0; color: #d9534f;"><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
+            </div>
+            
+            <div class="search-bar" style="flex: 1; margin: 0 50px;">
+                <div style="display: flex; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; max-width: 500px; margin: auto;">
+                    <input type="text" placeholder="Bạn cần tìm gì?" style="width: 100%; padding: 10px 15px; border: none; outline: none;">
+                    <button style="padding: 10px 20px; background-color: #fff; border: none; cursor: pointer; border-left: 1px solid #ccc; color: #f26522; font-weight: bold;">🔍</button>
+                </div>
+            </div>
+
+            <div class="user-actions" style="display: flex; align-items: center; gap: 30px;">
+                
+                <button id="btnOpenModal" class="btn-admin-add" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">+ Đăng Sách Nhanh</button>
+                
+                <div style="display: flex; align-items: center; gap: 10px; color: #f26522;">
+                    <span style="font-size: 28px;">🎧</span>
+                    <div>
+                        <div style="font-weight: bold; font-size: 16px;">0866 643 XXX</div>
+                        <div style="font-size: 12px; color: #666;">Hot line</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 24px; color: #f26522;">🛒</span>
+                    <a href="cart.html" id="cart-count-text" style="color: #f26522; font-weight: bold; text-decoration: none; font-size: 14px;">0 sản phẩm</a>
+                </div>
+                
+            </div>
+        </div>
+    </header>
+
+    <nav class="main-nav">
+        <ul>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">☰ DANH MỤC SẢN PHẨM</a>
+                
+                <div class="dropdown-content">
+                    
+                    <div class="dropdown-item">
+                        <a href="#" onclick="filterCategory(event, 'Sách')">📖 Sách - Truyện Tranh <span>›</span></a>
+                        <div class="sub-menu" style="min-width: 850px; grid-template-columns: repeat(3, 1fr);">
+                            
+                            <div class="sub-column">
+                                <h3>Sách Tiếng Việt nổi bật</h3>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Sách đồng giá</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Sách hot, best-seller</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Sách hay nên đọc</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Sách mới</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Sách sắp phát hành</a>
+                                
+                                <h3 style="margin-top: 20px;">Sách theo chủ đề</h3>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Tuổi học trò & Thời thanh xuân</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Sách cho phái đẹp</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Đam mê xê dịch</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Tiểu thuyết lãng mạn</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')" style="font-weight: bold; margin-top: 10px;">Tất cả chủ đề ></a>
+                            </div>
+
+                            <div class="sub-column">
+                                <h3>Danh mục</h3>
+                                <a href="#" onclick="filterCategory(event, 'Tiểu thuyết, thơ, hồi ký phóng sự...')">Tiểu thuyết, thơ, hồi ký phóng sự...</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách Kinh tế - Khởi nghiệp')">Sách Kinh tế - Khởi nghiệp</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách Kỹ năng sống')">Sách Kỹ năng sống</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách Ngoại ngữ')">Sách Ngoại ngữ</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách Nuôi dạy con')">Sách Nuôi dạy con</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách Thiếu nhi')">Sách Thiếu nhi</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách cho Teen')">Sách cho Teen</a>
+                                <a href="#" onclick="filterCategory(event, 'Chính trị - Triết học Đông Tây')">Chính trị - Triết học Đông Tây</a>
+                                <a href="#" onclick="filterCategory(event, 'Bách khoa tri thức')">Bách khoa tri thức</a>
+                                <a href="#" onclick="filterCategory(event, 'Kiến thức chuyên ngành, Khảo cứu')">Kiến thức chuyên ngành, Khảo cứu</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')" style="font-weight: bold; margin-top: 10px;">Tất cả danh mục ></a>
+                            </div>
+                            <div class="sub-column">
+                                <h3>Công ty phát hành</h3>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Phan Thị</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">NXB Trẻ</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">NXB Kim Đồng</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Nhã Nam</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Alphabooks</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Thái Hà</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Bách Việt</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Đinh Tị</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">First News - Trí Việt</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')">Văn Việt</a>
+                                <a href="#" onclick="filterCategory(event, 'Sách')" style="font-weight: bold; margin-top: 10px;">Tất cả công ty phát hành ></a>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </li>
+
+            <li><a href="#" onclick="filterCategory(event, 'all')">TẤT CẢ</a></li>
+            <li><a href="#" onclick="filterCategory(event, 'Sách')">SÁCH HAY</a></li>
+        </ul>
+    </nav>
+    <div id="addBookModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" id="btnCloseModal">&times;</span>
+            <h2>Thêm Sách Mới</h2>
+            <form id="addBookForm">
+                <div class="input-group">
+                    <label>Tên sách</label>
+                    <input type="text" id="bookTitle" required>
+                </div>
+                <div class="input-group">
+                    <label>Tác giả</label>
+                    <input type="text" id="bookAuthor" placeholder="Ví dụ: Toshikazu Kawaguchi">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex: 1;">
+                        <div class="input-group">
+                    <label>Danh mục sản phẩm</label>
+                    <select id="bookCategory" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="Sách">Sách - Truyện Tranh</option>
+                        <option value="Sách Mới">Sách Mới Cập Nhật</option>
+
+                        <optgroup label="Sách Tiếng Việt nổi bật">
+                            <option value="Sách đồng giá">Sách đồng giá</option>
+                            <option value="Sách hot, best-seller">Sách hot, best-seller</option>
+                            <option value="Sách hay nên đọc">Sách hay nên đọc</option>
+                            <option value="Sách mới">Sách mới</option>
+                            <option value="Sách sắp phát hành">Sách sắp phát hành</option>
+                        </optgroup>
+
+                        <optgroup label="Sách theo chủ đề">
+                            <option value="Tuổi học trò & Thời thanh xuân">Tuổi học trò & Thời thanh xuân</option>
+                            <option value="Sách cho phái đẹp">Sách cho phái đẹp</option>
+                            <option value="Đam mê xê dịch">Đam mê xê dịch</option>
+                            <option value="Tiểu thuyết lãng mạn">Tiểu thuyết lãng mạn</option>
+                        </optgroup>
+
+                        <optgroup label="Danh mục">
+                            <option value="Tiểu thuyết, thơ, hồi ký phóng sự...">Tiểu thuyết, thơ, hồi ký phóng sự...</option>
+                            <option value="Sách Kinh tế - Khởi nghiệp">Sách Kinh tế - Khởi nghiệp</option>
+                            <option value="Sách Kỹ năng sống">Sách Kỹ năng sống</option>
+                            <option value="Sách Ngoại ngữ">Sách Ngoại ngữ</option>
+                            <option value="Sách Nuôi dạy con">Sách Nuôi dạy con</option>
+                            <option value="Sách Thiếu nhi">Sách Thiếu nhi</option>
+                            <option value="Sách cho Teen">Sách cho Teen</option>
+                            <option value="Chính trị - Triết học Đông Tây">Chính trị - Triết học Đông Tây</option>
+                            <option value="Bách khoa tri thức">Bách khoa tri thức</option>
+                            <option value="Kiến thức chuyên ngành, Khảo cứu">Kiến thức chuyên ngành, Khảo cứu</option>
+                        </optgroup>
+                    </select>
+                </div>
+                        <label>Giá bán (VNĐ)</label>
+                        <input type="number" id="bookPrice" required>
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>Giá thị trường (VNĐ)</label>
+                        <input type="number" id="bookOriginalPrice" placeholder="Giá gốc">
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label>Nhà xuất bản</label>
+                        <input type="text" id="bookPublisher">
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>Số trang</label>
+                        <input type="number" id="bookPages">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Link ảnh bìa sách (URL)</label>
+                    <input type="text" id="bookImage" required>
+                </div>
+                <div class="input-group">
+                    <label>Giới thiệu sản phẩm</label>
+                    <textarea id="bookDescription" rows="4" placeholder="Nhập nội dung giới thiệu..."></textarea>
+                </div>
+                <button type="submit" class="btn-submit-form" id="btnSubmitForm">ĐĂNG SẢN PHẨM</button>
+                <p id="statusMsg" style="text-align: center; margin-top: 10px; font-weight: bold;"></p>
+            </form>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <section class="product-section">
+            <div class="section-title">
+                <h2>SÁCH HAY</h2>
+                <a href="#" class="view-more">Xem thêm ››</a>
+            </div>
+            
+            <div class="product-grid" id="book-grid">
+                <p style="grid-column: span 4; text-align: center; padding: 50px 0; color: #666;">Đang tải dữ liệu từ kho sách...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>TYTBOOKS</h3>
+                <p>Nhà sách trực tuyến của sinh viên CNTT 2.K24 - Đại học Hải Phòng.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 TYTBOOKS. Thiết kế bởi Nhóm 9.</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    
+    <script src="shop-logic.js"></script>
+
+    <div id="editBookModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+    <div class="modal-content" style="background: #fff; margin: 5% auto; padding: 25px; width: 500px; border-radius: 8px; position: relative;">
+        <span onclick="document.getElementById('editBookModal').style.display='none'" style="float: right; cursor: pointer; font-size: 24px;">&times;</span>
+        <h2 style="margin-bottom: 20px; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 5px; display: inline-block;">Sửa Thông Tin Sách</h2>
+        
+        <input type="hidden" id="edit-book-id"> <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tên sách</label>
+            <input type="text" id="edit-book-title" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tác giả</label>
+            <input type="text" id="edit-book-author" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Giá (VNĐ)</label>
+                <input type="number" id="edit-book-price" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Danh mục</label>
+                <input type="text" id="edit-book-category" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link ảnh</label>
+            <input type="text" id="edit-book-image" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Mô tả</label>
+            <textarea id="edit-book-description" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit;"></textarea>
+        </div>
+        
+        <button onclick="updateBookInFirebase()" style="width: 100%; background: #007bff; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">LƯU THAY ĐỔI</button>
+    </div>
+</div>
+</body>
+</html>

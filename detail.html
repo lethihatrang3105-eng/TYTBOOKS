@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chi tiết sản phẩm - TYTBOOKS</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS bổ sung riêng cho trang chi tiết */
+        .detail-container { max-width: 1200px; margin: 30px auto; padding: 20px; background: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .detail-top { display: flex; gap: 40px; margin-bottom: 40px; }
+        .detail-image { flex: 1; text-align: center; }
+        .detail-image img { max-width: 100%; border-radius: 8px; border: 1px solid #eaeaea; }
+        .detail-info { flex: 2; }
+        .detail-title { font-size: 24px; color: #333; margin-bottom: 10px; }
+        .detail-author { font-size: 14px; color: #666; margin-bottom: 20px; }
+        .detail-price-box { background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .price-current { color: #d9534f; font-size: 28px; font-weight: bold; margin-right: 15px; }
+        .price-old { color: #999; text-decoration: line-through; font-size: 16px; }
+        .detail-meta p { font-size: 14px; margin-bottom: 8px; color: #444; }
+        .btn-add-cart { background: #d9534f; color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; margin-top: 20px; width: 250px; }
+        .btn-add-cart:hover { background: #c9302c; }
+        .detail-description { border-top: 1px solid #eaeaea; padding-top: 20px; line-height: 1.8; color: #333; }
+        .detail-description h3 { margin-bottom: 15px; color: #d9534f; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="logo">
+                <h1><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
+            </div>
+            
+            <div class="search-bar" style="flex: 1; margin: 0 50px;">
+                <div style="display: flex; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; max-width: 500px; margin: auto;">
+                    <input type="text" placeholder="Bạn cần tìm gì?" style="width: 100%; padding: 10px 15px; border: none; outline: none;">
+                    <button style="padding: 10px 20px; background-color: #fff; border: none; cursor: pointer; border-left: 1px solid #ccc; color: #f26522; font-weight: bold;">🔍</button>
+                </div>
+            </div>
+
+            <div class="user-actions" style="display: flex; align-items: center; gap: 30px;">
+                <div style="display: flex; align-items: center; gap: 10px; color: #f26522;">
+                    <span style="font-size: 28px;">🎧</span>
+                    <div>
+                        <div style="font-weight: bold; font-size: 16px;">0866 643 XXX</div>
+                        <div style="font-size: 12px; color: #666;">Hot line</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 24px; color: #f26522;">🛒</span>
+                    <a href="cart.html" id="cart-count-text" style="color: #f26522; font-weight: bold; text-decoration: none; font-size: 14px;">0 sản phẩm</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="detail-container" id="book-detail-content">
+        <h2 style="text-align: center; padding: 50px; color: #666;">Đang tải thông tin sách...</h2>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="detail-logic.js"></script>
+
+    <div id="cartPopupModal" class="modal" style="z-index: 1000; display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+        <div class="modal-content" style="background: #fff; margin: 10% auto; width: 700px; border-radius: 4px; overflow: hidden; position: relative;">
+            
+            <div style="padding: 15px 20px; font-size: 18px; font-weight: bold; color: #28a745; border-bottom: 1px solid #eaeaea;">
+                ✔ <span id="success-item-count">1</span> sản phẩm vừa được thêm vào giỏ hàng
+                <span onclick="closeCartModal()" style="float: right; color: #ccc; cursor: pointer; font-size: 24px; margin-top: -5px;">&times;</span>
+            </div>
+            
+            <div style="display: flex; padding: 20px; gap: 20px;">
+                
+                <div style="flex: 3; display: flex; gap: 15px; border-right: 1px solid #eaeaea; padding-right: 20px;">
+                    <img id="modal-book-img" src="" style="width: 100px; height: 140px; object-fit: cover; border: 1px solid #eee;">
+                    <div>
+                        <h4 id="modal-book-title" style="margin-bottom: 8px; color: #333; font-size: 15px; line-height: 1.4;">Tên sách</h4>
+                        <p id="modal-book-author" style="font-size: 13px; color: #666; margin-bottom: 4px;">Tác giả:</p>
+                        <p id="modal-book-price" style="font-weight: bold; color: #333; font-size: 16px; margin-top: 10px;">0đ</p>
+                    </div>
+                </div>
+
+                <div style="flex: 2; display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <p style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; color: #333;">
+                            <span>Giỏ hàng (<span id="summary-count">1</span> sản phẩm)</span>
+                        </p>
+                        <p style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; color: #666;">
+                            <span>Tạm tính:</span>
+                            <span id="modal-total-price" style="font-weight: bold; color: #333;">0đ</span>
+                        </p>
+                        <p style="display: flex; justify-content: space-between; font-size: 16px; font-weight: bold; margin-bottom: 20px; border-top: 1px solid #eaeaea; padding-top: 10px;">
+                            <span>Thành tiền:</span>
+                            <span id="modal-final-price" style="color: #d9534f;">0đ</span>
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="closeCartModal()" style="flex: 1; padding: 10px; background: #ddd; color: #333; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">← Tiếp tục</button>
+                        <button onclick="window.location.href='cart.html'" style="flex: 1; padding: 10px; background: #f26522; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Thanh toán ➔</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</body>
+</html>

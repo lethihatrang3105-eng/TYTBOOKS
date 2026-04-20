@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Giỏ hàng - TYTBOOKS</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .cart-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; font-family: Arial, sans-serif; }
+        .cart-title { font-size: 24px; font-weight: normal; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eaeaea; }
+        .cart-content { display: flex; gap: 30px; }
+        .cart-items { flex: 3; }
+        .cart-summary { flex: 1; }
+        
+        /* Box tóm tắt đơn hàng bên phải */
+        .summary-box { background: #f9f9f9; padding: 20px; border: 1px solid #eaeaea; text-align: center; }
+        .summary-box .total-qty { font-weight: bold; font-size: 16px; margin-bottom: 10px; }
+        .summary-box .total-price { color: #d9534f; font-size: 24px; font-weight: bold; margin-bottom: 5px; }
+        .summary-box .note { color: #666; font-size: 12px; margin-bottom: 20px; }
+        .btn-checkout { background: #f26522; color: white; width: 100%; padding: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn-checkout:hover { background: #d84b0f; }
+
+        /* Item trong giỏ hàng */
+        .cart-item { display: flex; align-items: center; padding: 20px 0; border-bottom: 1px solid #eaeaea; }
+        .item-img { width: 80px; height: 110px; object-fit: cover; border: 1px solid #ddd; margin-right: 20px; }
+        .item-info { flex: 2; font-size: 14px; line-height: 1.6; }
+        .item-info a { color: #007bff; text-decoration: none; }
+        .item-info .actions { font-size: 12px; margin-top: 10px; }
+        .item-info .actions a { color: #d9534f; cursor: pointer; }
+        
+        .item-price { flex: 1; font-weight: bold; font-size: 16px; text-align: center; }
+        
+        .item-qty { display: flex; align-items: center; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; height: 35px; }
+        .item-qty button { background: #fff; border: none; width: 30px; cursor: pointer; font-size: 16px; }
+        .item-qty input { width: 40px; text-align: center; border: none; border-left: 1px solid #ccc; border-right: 1px solid #ccc; height: 100%; outline: none; pointer-events: none;}
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            <div class="logo">
+                <h1><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
+            </div>
+            <div class="search-bar" style="flex: 1; margin: 0 50px;">
+                <div style="display: flex; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; max-width: 500px; margin: auto;">
+                    <input type="text" placeholder="Bạn cần tìm gì?" style="width: 100%; padding: 10px 15px; border: none; outline: none;">
+                    <button style="padding: 10px 20px; background-color: #fff; border: none; cursor: pointer; border-left: 1px solid #ccc; color: #f26522; font-weight: bold;">🔍</button>
+                </div>
+            </div>
+            <div class="user-actions" style="display: flex; align-items: center; gap: 30px;">
+                <div style="display: flex; align-items: center; gap: 10px; color: #f26522;">
+                    <span style="font-size: 28px;">🎧</span>
+                    <div>
+                        <div style="font-weight: bold; font-size: 16px;">0933 109 009</div>
+                        <div style="font-size: 12px; color: #666;">Hot line</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 24px; color: #f26522;">🛒</span>
+                    <a href="cart.html" id="cart-count-text" style="color: #f26522; font-weight: bold; text-decoration: none; font-size: 14px;">Giỏ hàng</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="cart-container">
+        <h2 class="cart-title">Giỏ hàng</h2>
+        
+        <div class="cart-content" id="cart-content-wrapper">
+            </div>
+    </div>
+
+    <script>
+        function renderCart() {
+            const cartWrapper = document.getElementById('cart-content-wrapper');
+            let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+
+            if (cart.length === 0) {
+                cartWrapper.innerHTML = '<p style="text-align: center; width: 100%; padding: 50px; font-size: 18px; color: #666;">Giỏ hàng của bạn đang trống. <a href="index.html">Tiếp tục mua sắm</a></p>';
+                return;
+            }
+
+            let htmlItems = '<div class="cart-items">';
+            let totalPrice = 0;
+            let totalQty = 0;
+
+            cart.forEach((item, index) => {
+                totalPrice += item.price * item.quantity;
+                totalQty += item.quantity;
+                const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price);
+
+                htmlItems += `
+                    <div class="cart-item">
+                        <img src="${item.image}" class="item-img" alt="${item.title}">
+                        <div class="item-info">
+                            <p style="margin-bottom: 5px;">${index + 1}. ${item.title}</p>
+                            <p style="margin-bottom: 5px; color: #666;">Tác giả: <a href="#">${item.author || 'Đang cập nhật'}</a></p>
+                            <p style="color: #666;">Loại: Sách</p>
+                            <div class="actions">
+                                <a onclick="removeItem(${index})">Xóa</a> | <a style="color:#007bff;">Thêm vào yêu thích</a>
+                            </div>
+                        </div>
+                        <div class="item-price">${formattedPrice}</div>
+                        <div class="item-qty">
+                            <button onclick="changeQty(${index}, -1)">-</button>
+                            <input type="text" value="${item.quantity}">
+                            <button onclick="changeQty(${index}, 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+            htmlItems += '</div>';
+
+            const formattedTotal = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice);
+            
+            const htmlSummary = `
+                <div class="cart-summary">
+                    <div class="summary-box">
+                        <div class="total-qty">${totalQty} sản phẩm</div>
+                        <div class="total-price">${formattedTotal}</div>
+                        <div class="note">(Chưa có cước vận chuyển)</div>
+                        <button class="btn-checkout" onclick="alert('Đang chuyển hướng thanh toán...')">Tiến hành đặt hàng</button>
+                    </div>
+                </div>
+            `;
+
+            cartWrapper.innerHTML = htmlItems + htmlSummary;
+        }
+
+        // Hàm thay đổi số lượng
+        function changeQty(index, change) {
+            let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+            cart[index].quantity += change;
+            if (cart[index].quantity <= 0) cart.splice(index, 1); // Xóa nếu số lượng = 0
+            localStorage.setItem('tyt_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        // Hàm xóa sản phẩm
+        function removeItem(index) {
+            let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+            cart.splice(index, 1);
+            localStorage.setItem('tyt_cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        // Chạy hàm vẽ giỏ hàng khi mở trang
+        renderCart();
+    </script>
+</body>
+</html>
