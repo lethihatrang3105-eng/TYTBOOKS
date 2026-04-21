@@ -48,7 +48,7 @@ window.onclick = function(event) {
 }
 
 // -------------------------------------------------------------------
-// PHẦN 2: LƯU SÁCH CÓ THÊM PHẦN DANH MỤC
+// PHẦN 2: LƯU SÁCH CÓ THÊM PHẦN DANH MỤC VÀ TÌNH TRẠNG
 // -------------------------------------------------------------------
 document.getElementById('addBookForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -58,7 +58,8 @@ document.getElementById('addBookForm').addEventListener('submit', function(e) {
     db.collection("books").add({
         title: document.getElementById('bookTitle').value,
         author: document.getElementById('bookAuthor').value,
-        category: document.getElementById('bookCategory').value, // BẮT THÊM DANH MỤC Ở ĐÂY
+        category: document.getElementById('bookCategory').value, 
+        status: document.getElementById('book-status').value, // <--- THÊM DÒNG NÀY: Lưu tình trạng khi đăng sách
         price: Number(document.getElementById('bookPrice').value),
         originalPrice: Number(document.getElementById('bookOriginalPrice').value),
         publisher: document.getElementById('bookPublisher').value,
@@ -98,7 +99,7 @@ function renderBooks() {
     bookGrid.innerHTML = ''; 
 
     // Lọc sách theo currentFilter
-    const filteredBooks = currentFilter === 'all' 
+const filteredBooks = currentFilter === 'all' 
         ? allBooks 
         : allBooks.filter(book => book.category === currentFilter);
 
@@ -200,7 +201,6 @@ window.loginWithFacebook = function() {
         document.getElementById('authModal').style.display = 'none';
     }).catch(error => alert('Lỗi: ' + error.message));
 };
-
 window.loginWithEmail = function() {
     const email = document.getElementById('login-email').value;
     const pass = document.getElementById('login-password').value;
@@ -250,22 +250,22 @@ auth.onAuthStateChanged(user => {
 
 // Hàm kiểm tra và ẩn/hiện nút
 function checkAdminPrivileges(user) {
+   // Thay thế nội dung trong hàm checkAdminPrivileges cũ bằng đoạn này:
     const btnAddBook = document.getElementById('btnOpenModal');
+    const btnViewOrders = document.getElementById('btnViewOrders'); // Bổ sung
     const deleteButtons = document.querySelectorAll('.btn-delete');
-    const editButtons = document.querySelectorAll('.btn-edit-item'); // Quét tìm tất cả nút sửa
+    const editButtons = document.querySelectorAll('.btn-edit-item');
 
-    // BẠN PHẢI THAY ĐÚNG EMAIL CỦA BẠN VÀO ĐÂY THÌ NÚT MỚI HIỆN
     const adminEmail = 'lethihatrang3105@gmail.com'; 
 
     if (user && user.email === adminEmail) {
-        // NẾU LÀ ADMIN: Hiện tất cả nút quyền lực
         if (btnAddBook) btnAddBook.style.display = 'block';
+        if (btnViewOrders) btnViewOrders.style.display = 'block'; // Admin thấy nút
         deleteButtons.forEach(btn => btn.style.display = 'flex');
         editButtons.forEach(btn => btn.style.display = 'flex'); 
-        console.log("Đã mở khóa quyền Admin cho: " + user.email);
     } else {
-        // NẾU LÀ KHÁCH: Giấu sạch
         if (btnAddBook) btnAddBook.style.display = 'none';
+        if (btnViewOrders) btnViewOrders.style.display = 'none'; // Khách không thấy
         deleteButtons.forEach(btn => btn.style.display = 'none');
         editButtons.forEach(btn => btn.style.display = 'none');
     }
@@ -394,6 +394,7 @@ window.openEditModal = function(id) {
             document.getElementById('edit-book-author').value = book.author || "";
             document.getElementById('edit-book-price').value = book.price || 0;
             document.getElementById('edit-book-category').value = book.category || "";
+            document.getElementById('edit-book-status').value = book.status || "Còn hàng"; // <--- THÊM DÒNG NÀY: Lấy tình trạng cũ
             document.getElementById('edit-book-image').value = book.image || "";
             document.getElementById('edit-book-description').value = book.description || "";
             
@@ -410,6 +411,7 @@ window.updateBookInFirebase = function() {
         author: document.getElementById('edit-book-author').value,
         price: Number(document.getElementById('edit-book-price').value),
         category: document.getElementById('edit-book-category').value,
+        status: document.getElementById('edit-book-status').value, // <--- THÊM DÒNG NÀY: Lưu lại tình trạng mới
         image: document.getElementById('edit-book-image').value,
         description: document.getElementById('edit-book-description').value
     };
@@ -419,9 +421,96 @@ window.updateBookInFirebase = function() {
         document.getElementById('editBookModal').style.display = 'none';
     }).catch(err => alert("Lỗi: " + err));
 };
+// ==========================================
+// HỆ THỐNG QUẢN LÝ ĐƠN HÀNG (CHỈ ADMIN)
+// ==========================================
+window.openOrderManager = function() {
+    document.getElementById('orderManagerModal').style.display = 'block';
+    const orderListDiv = document.getElementById('admin-orders-list');
+    orderListDiv.innerHTML = '<p style="text-align: center; color: #666;">Đang tải dữ liệu...</p>';
 
-// 3. Cập nhật hàm Giấu nút (Sửa lại hàm checkAdminPrivileges cũ của bạn)
-// Hãy thêm dòng này vào trong hàm checkAdminPrivileges:
-// const editBtns = document.querySelectorAll('.btn-edit-item');
-// if (isAdmin) { editBtns.forEach(b => b.style.display = 'flex'); }
-// else { editBtns.forEach(b => b.style.display = 'none'); }
+    // Kéo đơn hàng mới nhất về
+    db.collection("orders").orderBy("createdAt", "desc").get().then((snapshot) => {
+        orderListDiv.innerHTML = '';
+        if (snapshot.empty) {
+            orderListDiv.innerHTML = '<p style="text-align:center; color:red;">Chưa có đơn hàng nào.</p>';
+            return;
+        }
+
+        snapshot.forEach((doc) => {
+            const order = doc.data();
+            const orderId = doc.id;
+            
+            // Xử lý ngày giờ
+            let dateStr = "Chưa rõ thời gian";
+            if (order.createdAt) {
+                const dateObj = order.createdAt.toDate();
+                dateStr = dateObj.toLocaleDateString('vi-VN') + " " + dateObj.toLocaleTimeString('vi-VN');
+            }
+
+            // Xử lý danh sách sách khách mua
+            let itemsHTML = '';
+            (order.items || []).forEach(item => {
+                itemsHTML += `<li>- ${item.quantity || 1} x <strong>${item.title}</strong></li>`;
+            });
+
+            // Tổng tiền
+            const formatPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount || 0);
+            
+            // Màu sắc trạng thái
+            let statusColor = order.status === "Đã giao" ? "green" : "#f26522";
+
+            const orderCard = `
+                <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px; background: #fafafa; position: relative;">
+                    <div style="display:flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px;">
+                        <span style="font-size: 13px; color: #666;">Ngày đặt: <strong>${dateStr}</strong></span>
+                        <span style="font-size: 13px; font-weight: bold; color: ${statusColor}; background: #fff; padding: 2px 8px; border: 1px solid ${statusColor}; border-radius: 12px;">${order.status}</span>
+                    </div>
+                    <div style="display: flex; gap: 20px;">
+                        <div style="flex: 1; border-right: 1px solid #eee;">
+                            <p style="margin-bottom: 5px;">👤 Khách: <strong>${order.customerName}</strong></p>
+                            <p style="margin-bottom: 5px;">📞 SĐT: <strong>${order.customerPhone}</strong></p>
+                            <p style="margin-bottom: 5px; font-size: 13px;">📍 Đ/c: ${order.customerAddress}</p>
+                            <p style="margin-bottom: 5px; font-size: 13px; color:#888;">📝 Ghi chú: ${order.note || 'Không có'}</p>
+                        </div>
+                        <div style="flex: 1;">
+                            <p style="font-weight: bold; margin-bottom: 5px;">Sản phẩm đặt mua:</p>
+                            <ul style="list-style: none; padding: 0; font-size: 13px; margin-bottom: 10px;">
+                                ${itemsHTML}
+                            </ul>
+                            <p style="font-size: 16px;">Tổng tiền: <strong style="color: #d9534f;">${formatPrice}</strong></p>
+                            
+                            <div style="margin-top: 15px;">
+                                <button onclick="markOrderDone('${orderId}')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">✔ Đánh dấu Đã giao</button>
+                                <button onclick="deleteOrder('${orderId}')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 5px;">🗑 Hủy đơn</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            orderListDiv.innerHTML += orderCard;
+        });
+    }).catch(err => {
+        orderListDiv.innerHTML = '<p style="color:red;">Lỗi tải dữ liệu: ' + err.message + '</p>';
+    });
+};
+
+// Hàm cập nhật trạng thái thành Đã Giao
+window.markOrderDone = function(orderId) {
+    if(confirm("Xác nhận đơn hàng này ĐÃ GIAO thành công?")) {
+        db.collection("orders").doc(orderId).update({ status: "Đã giao" }).then(() => {
+            alert("Đã cập nhật trạng thái!");
+            openOrderManager(); // Tải lại danh sách
+        });
+    }
+};
+
+// Hàm xóa đơn hàng
+window.deleteOrder = function(orderId) {
+    if(confirm("Bạn có chắc chắn muốn XÓA/HỦY đơn hàng này? Khách hàng sẽ buồn đó nha!")) {
+        db.collection("orders").doc(orderId).delete().then(() => {
+            alert("Đã xóa đơn hàng.");
+            openOrderManager(); // Tải lại danh sách
+        });
+    }
+};
