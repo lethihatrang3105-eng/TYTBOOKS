@@ -48,8 +48,7 @@
             </div>
         </div>
     </header>
-
-    <nav class="main-nav">
+<nav class="main-nav">
         <ul>
             <li class="dropdown">
                 <a href="#" class="dropbtn">☰ DANH MỤC SẢN PHẨM</a>
@@ -183,7 +182,17 @@
                         <input type="number" id="bookPages">
                     </div>
                 </div>
-                <div class="input-group">
+
+                <div class="input-group" style="margin-top: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tình trạng sản phẩm</label>
+                    <select id="book-status" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <option value="Còn hàng">Còn hàng</option>
+                        <option value="Hết hàng">Hết hàng</option>
+                        <option value="Sắp về">Sắp về</option>
+                    </select>
+                </div>
+
+                <div class="input-group" style="margin-top: 15px;">
                     <label>Link ảnh bìa sách (URL)</label>
                     <input type="text" id="bookImage" required>
                 </div>
@@ -227,13 +236,14 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     
     <script src="shop-logic.js"></script>
-
-    <div id="editBookModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
+    
+<div id="editBookModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
     <div class="modal-content" style="background: #fff; margin: 5% auto; padding: 25px; width: 500px; border-radius: 8px; position: relative;">
         <span onclick="document.getElementById('editBookModal').style.display='none'" style="float: right; cursor: pointer; font-size: 24px;">&times;</span>
         <h2 style="margin-bottom: 20px; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 5px; display: inline-block;">Sửa Thông Tin Sách</h2>
         
-        <input type="hidden" id="edit-book-id"> <div class="input-group" style="margin-bottom: 15px;">
+        <input type="hidden" id="edit-book-id"> 
+        <div class="input-group" style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tên sách</label>
             <input type="text" id="edit-book-title" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
         </div>
@@ -251,6 +261,16 @@
                 <input type="text" id="edit-book-category" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
             </div>
         </div>
+
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tình trạng</label>
+            <select id="edit-book-status" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                <option value="Còn hàng">Còn hàng</option>
+                <option value="Hết hàng">Hết hàng</option>
+                <option value="Sắp về">Sắp về</option>
+            </select>
+        </div>
+
         <div class="input-group" style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link ảnh</label>
             <input type="text" id="edit-book-image" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
