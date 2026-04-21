@@ -255,7 +255,7 @@ function checkAdminPrivileges(user) {
     const editButtons = document.querySelectorAll('.btn-edit-item'); // Quét tìm tất cả nút sửa
 
     // BẠN PHẢI THAY ĐÚNG EMAIL CỦA BẠN VÀO ĐÂY THÌ NÚT MỚI HIỆN
-    const adminEmail = 'lethihatrang@gmail.com'; 
+    const adminEmail = 'lethihatrang3105@gmail.com'; 
 
     if (user && user.email === adminEmail) {
         // NẾU LÀ ADMIN: Hiện tất cả nút quyền lực
