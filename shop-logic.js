@@ -514,3 +514,15 @@ window.deleteOrder = function(orderId) {
         });
     }
 };
+// ĐOẠN CODE THÊM VÀO CUỐI CÙNG: ĐẢM BẢO ẨN NÚT XÓA VÀ SỬA VỚI KHÁCH HÀNG
+db.collection("books").onSnapshot(() => {
+    setTimeout(() => {
+        const user = firebase.auth().currentUser;
+        // Kiểm tra nếu chưa đăng nhập, hoặc email không phải Admin thì ẩn nút đi
+        if (!user || user.email !== 'lethihatrang3105@gmail.com') {
+            document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => {
+                btn.style.display = 'none';
+            });
+        }
+    }, 300); // Chờ 0.3 giây sau khi tải xong sách để giấu nút
+});
