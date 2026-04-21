@@ -61,7 +61,7 @@ if (!bookId) {
                     <button class="btn-add-cart" disabled style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: not-allowed; background: #ccc; color: white; border: none; width: 50%;">HẾT HÀNG</button>
                 `;
             } else {
-                // Nút bình thường nếu còn hàng
+                // Nút bình thường nếu còn hàng hoặc Sắp về
                 buttonsHTML = `
                     <button class="btn-add-cart" onclick="addToCart('${safeTitle}', ${book.price}, '${imageUrl}', '${safeAuthor}')" style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; background: white; color: #d9534f; border: 1px solid #d9534f; width: 50%;">THÊM VÀO GIỎ HÀNG</button>
                     <button class="btn-add-cart" onclick="addToCart('${safeTitle}', ${book.price}, '${imageUrl}', '${safeAuthor}')" style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; background: #f26522; color: white; border: none; width: 50%;">MUA NGAY</button>
@@ -88,6 +88,7 @@ if (!bookId) {
                             <p><strong>Nhà xuất bản:</strong> ${book.publisher || 'Đang cập nhật'}</p>
                             <p><strong>Số trang:</strong> ${book.pages ? book.pages + ' trang' : 'Đang cập nhật'}</p>
                             <p style="margin-bottom: 15px; font-size: 15px;"><strong>Tình trạng:</strong> <span style="color: ${statusColor}; font-weight: bold;">${bookStatus}</span></p>
+                            
                         </div>
                         
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
@@ -99,7 +100,7 @@ if (!bookId) {
                 <div class="dark-section-wrapper">
                     <div class="dark-main-content">
                         <h2>Giới thiệu sản phẩm</h2>
-                        <h3 style="color: #d9534f;">${book.title}</h3>
+                        <h3>${book.title}</h3>
                         <p class="desc-text">${book.description ? book.description.replace(/\n/g, '<br>') : 'Thông tin chi tiết đang cập nhật...'}</p>
                     </div>
                 </div>
