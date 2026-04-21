@@ -49,6 +49,25 @@ if (!bookId) {
             const safeTitle = book.title ? book.title.replace(/'/g, "\\'") : '';
             const safeAuthor = book.author ? book.author.replace(/'/g, "\\'") : '';
 
+            // --- ĐÃ THÊM: XỬ LÝ TÌNH TRẠNG SẢN PHẨM VÀ ĐỔI MÀU / KHÓA NÚT ---
+            const bookStatus = book.status || "Còn hàng";
+            const statusColor = bookStatus === "Hết hàng" ? "red" : "#28a745"; // Đỏ nếu hết, Xanh nếu còn
+            let buttonsHTML = '';
+
+            if (bookStatus === "Hết hàng") {
+                // Khóa nút nếu hết hàng
+                buttonsHTML = `
+                    <button class="btn-add-cart" disabled style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: not-allowed; background: #ccc; color: white; border: 1px solid #ccc; width: 50%;">HẾT HÀNG</button>
+                    <button class="btn-add-cart" disabled style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: not-allowed; background: #ccc; color: white; border: none; width: 50%;">HẾT HÀNG</button>
+                `;
+            } else {
+                // Nút bình thường nếu còn hàng
+                buttonsHTML = `
+                    <button class="btn-add-cart" onclick="addToCart('${safeTitle}', ${book.price}, '${imageUrl}', '${safeAuthor}')" style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; background: white; color: #d9534f; border: 1px solid #d9534f; width: 50%;">THÊM VÀO GIỎ HÀNG</button>
+                    <button class="btn-add-cart" onclick="addToCart('${safeTitle}', ${book.price}, '${imageUrl}', '${safeAuthor}')" style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; background: #f26522; color: white; border: none; width: 50%;">MUA NGAY</button>
+                `;
+            }
+
             // ĐỔ MÃ HTML (Bao gồm cả bố cục trên dưới và nền đen)
             detailContainer.innerHTML = `
                 <div class="detail-top">
@@ -68,12 +87,11 @@ if (!bookId) {
                         <div class="detail-meta" style="font-size: 14px; line-height: 1.8; color: #444;">
                             <p><strong>Nhà xuất bản:</strong> ${book.publisher || 'Đang cập nhật'}</p>
                             <p><strong>Số trang:</strong> ${book.pages ? book.pages + ' trang' : 'Đang cập nhật'}</p>
-                            <p><strong>Tình trạng:</strong> Còn hàng</p>
+                            <p style="margin-bottom: 15px; font-size: 15px;"><strong>Tình trạng:</strong> <span style="color: ${statusColor}; font-weight: bold;">${bookStatus}</span></p>
                         </div>
                         
                         <div style="display: flex; gap: 10px; margin-top: 20px;">
-                            <button class="btn-add-cart" onclick="addToCart('${safeTitle}', ${book.price}, '${imageUrl}', '${safeAuthor}')" style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; background: white; color: #d9534f; border: 1px solid #d9534f; width: 50%;">THÊM VÀO GIỎ HÀNG</button>
-                            <button class="btn-add-cart" onclick="addToCart('${safeTitle}', ${book.price}, '${imageUrl}', '${safeAuthor}')" style="padding: 15px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; background: #f26522; color: white; border: none; width: 50%;">MUA NGAY</button>
+                            ${buttonsHTML}
                         </div>
                     </div>
                 </div>
@@ -81,7 +99,7 @@ if (!bookId) {
                 <div class="dark-section-wrapper">
                     <div class="dark-main-content">
                         <h2>Giới thiệu sản phẩm</h2>
-                        <h3>${book.title}</h3>
+                        <h3 style="color: #d9534f;">${book.title}</h3>
                         <p class="desc-text">${book.description ? book.description.replace(/\n/g, '<br>') : 'Thông tin chi tiết đang cập nhật...'}</p>
                     </div>
                 </div>
