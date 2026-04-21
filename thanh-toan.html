@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán - TYTBOOKS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f5f5f5; color: #333; line-height: 1.5; }
+        .header { background: #fff; padding: 15px 0; border-bottom: 1px solid #ddd; display: flex; justify-content: center; align-items: center; }
+        .header h1 { color: #f26522; font-size: 24px; letter-spacing: 2px; }
+        
+        .checkout-container { max-width: 1100px; margin: 30px auto; display: flex; gap: 30px; padding: 0 20px; }
+        
+        /* CỘT TRÁI - FORM NHẬP LIỆU */
+        .checkout-left { flex: 2; }
+        .checkout-section { background: #fff; padding: 25px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .section-title { font-size: 16px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 15px; display: flex; align-items: center; }
+        .form-group label { width: 150px; font-size: 14px; }
+        .form-group label span { color: red; }
+        .form-control { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+        .form-control:focus { border-color: #f26522; }
+        
+        .radio-group { margin-bottom: 12px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        
+        /* CỘT PHẢI - ĐƠN HÀNG */
+        .checkout-right { flex: 1; }
+        .order-summary { background: #fff; padding: 25px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: sticky; top: 20px; }
+        .order-item { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
+        .order-item-title { flex: 2; color: #007bff; padding-right: 10px; }
+        .order-item-price { flex: 1; text-align: right; font-weight: bold; }
+        
+        .summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+        .summary-total { font-size: 18px; font-weight: bold; color: #f26522; }
+        
+        .btn-submit { background: #f26522; color: #fff; border: none; padding: 12px 20px; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 15px; text-align: center; display: block; text-decoration: none; }
+        .btn-submit:hover { background: #d84b0f; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>TYTBOOKS - THANH TOÁN</h1>
+    </div>
+
+    <div class="checkout-container">
+        <div class="checkout-left">
+            <div class="checkout-section">
+                <div class="section-title">ĐỊA CHỈ GIAO HÀNG</div>
+                <div class="form-group"><label>Họ tên <span>*</span></label><input type="text" class="form-control"></div>
+                <div class="form-group"><label>Email nhận đơn <span>*</span></label><input type="email" class="form-control"></div>
+                <div class="form-group"><label>Di động <span>*</span></label><input type="text" class="form-control"></div>
+                <div class="form-group"><label>Tỉnh / Thành phố <span>*</span></label><input type="text" class="form-control"></div>
+                <div class="form-group"><label>Số nhà & tên đường <span>*</span></label><textarea class="form-control" rows="2"></textarea></div>
+            </div>
+
+            <div class="checkout-section">
+                <div class="section-title">PHƯƠNG THỨC VẬN CHUYỂN</div>
+                <div class="radio-group"><input type="radio" name="shipping" checked> Chuyển thường (Giao hàng tiêu chuẩn)</div>
+                <div class="radio-group"><input type="radio" name="shipping"> Chuyển nhanh (Giao hàng hỏa tốc)</div>
+            </div>
+
+            <div class="checkout-section">
+                <div class="section-title">PHƯƠNG THỨC THANH TOÁN</div>
+                <div class="radio-group"><input type="radio" name="payment"> Thẻ ATM đăng ký Internet Banking</div>
+                <div class="radio-group"><input type="radio" name="payment"> Ví điện tử (Momo, ZaloPay)</div>
+                <div class="radio-group"><input type="radio" name="payment" checked> Thanh toán tiền mặt khi nhận hàng (COD)</div>
+            </div>
+
+            <div class="checkout-section">
+                <div class="section-title">THÔNG TIN KHÁC</div>
+                <textarea class="form-control" rows="3" placeholder="Ghi chú cho TYTBOOKS"></textarea>
+            </div>
+            
+            <button class="btn-submit" onclick="placeOrder()">ĐẶT MUA</button>
+        </div>
+
+        <div class="checkout-right">
+            <div class="order-summary">
+                <div class="section-title">ĐƠN HÀNG CỦA BẠN</div>
+                <div id="checkout-items">
+                    </div>
+                
+                <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
+                    <div class="summary-row"><span>Tiền hàng</span><span id="sub-total">0đ</span></div>
+                    <div class="summary-row"><span>Phí vận chuyển</span><span>Chưa có</span></div>
+                    <div class="summary-row" style="margin-top: 10px;"><span style="font-weight: bold;">Tổng cộng</span><span class="summary-total" id="final-total">0đ</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // HÀM SIÊU THÍCH ỨNG: Tự động tìm giỏ hàng trong LocalStorage
+        function loadCheckoutCart() {
+            let cart = [];
+            let cartKey = 'cart'; // Mặc định
+
+            // 1. Quét toàn bộ LocalStorage để tìm cái nào là giỏ hàng thực sự
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                try {
+                    let data = JSON.parse(localStorage.getItem(key));
+                    // Nếu nó là một mảng và có chứa phần tử có giá tiền (price)
+                    if (Array.isArray(data) && data.length > 0 && data[0].hasOwnProperty('price')) {
+                        cart = data;
+                        cartKey = key;
+                        break; // Tìm thấy rồi thì dừng lại
+                    }
+                } catch(e) {
+                    // Bỏ qua các dữ liệu không phải JSON
+                }
+            }
+
+            const itemsContainer = document.getElementById('checkout-items');
+            let totalPrice = 0;
+
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '<p style="color:red; font-size: 14px; font-weight: bold;">Giỏ hàng trống. Vui lòng quay lại chọn sách!</p>';
+                return;
+            }
+
+            itemsContainer.innerHTML = '';
+            cart.forEach(item => {
+                // 2. Tự động tương thích mọi cách đặt tên (title hay name, quantity hay qty)
+                let itemTitle = item.title || item.name || item.bookName || "Sách không tên";
+                let itemQty = item.quantity || item.qty || item.soluong || 1;
+                let itemPrice = Number(item.price) || 0;
+
+                let itemTotal = itemPrice * itemQty;
+                totalPrice += itemTotal;
+                
+                // Định dạng tiền tệ VNĐ
+                let formattedTotal = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(itemTotal);
+                
+                itemsContainer.innerHTML += `
+                    <div class="order-item">
+                        <div class="order-item-title">${itemQty} x ${itemTitle}</div>
+                        <div class="order-item-price">${formattedTotal}</div>
+                    </div>
+                `;
+            });
+
+            let finalPriceFormatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice);
+            document.getElementById('sub-total').innerText = finalPriceFormatted;
+            document.getElementById('final-total').innerText = finalPriceFormatted;
+
+            // Lưu lại cái key giỏ hàng để lát Đặt mua xong thì xóa đúng cái đó
+            window.currentCartKey = cartKey;
+        }
+
+        // Hàm xử lý khi bấm nút ĐẶT MUA
+        function placeOrder() {
+            let cartKey = window.currentCartKey || 'cart';
+            let cart = JSON.parse(localStorage.getItem(cartKey)) || [];
+            
+            if (cart.length === 0) {
+                alert("Giỏ hàng của bạn đang trống!");
+                return;
+            }
+            
+            alert("Chúc mừng! Đơn hàng của bạn đã được đặt thành công. TYTBOOKS sẽ liên hệ với bạn sớm nhất!");
+            
+            // Xóa sạch giỏ hàng sau khi đặt thành công
+            localStorage.removeItem(cartKey);
+            
+            // Chuyển về trang chủ
+            window.location.href = 'index.html';
+        }
+
+        // Chạy hàm khi trang vừa tải xong
+        window.onload = loadCheckoutCart;
+    </script>
+</body>
+</html>

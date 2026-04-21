@@ -147,5 +147,17 @@
         // Chạy hàm vẽ giỏ hàng khi mở trang
         renderCart();
     </script>
+    <script>
+    // Lắng nghe mọi cú click trên trang giỏ hàng
+    document.addEventListener('click', function(event) {
+        let phanTuDuocClick = event.target;
+        
+        // Nếu phần tử được click là một cái Nút (BUTTON) và có chứa chữ "đặt hàng"
+        if (phanTuDuocClick.tagName === 'BUTTON' && phanTuDuocClick.innerText.toLowerCase().includes('đặt hàng')) {
+            // Chuyển hướng sang trang thanh toán
+            window.location.href = 'thanh-toan.html';
+        }
+    });
+</script>
 </body>
 </html>

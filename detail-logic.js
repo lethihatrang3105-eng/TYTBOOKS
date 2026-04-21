@@ -138,6 +138,20 @@ window.closeCartModal = function() {
     document.getElementById('cartPopupModal').style.display = 'none';
 };
 
+// Tự động tìm và gán link sang trang thanh toán cho nút Tiến hành đặt hàng
+window.addEventListener('DOMContentLoaded', () => {
+    // Tìm tất cả các nút (button) trên trang giỏ hàng
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(btn => {
+        // Nếu nút nào có chứa chữ "đặt hàng" hoặc "Tiến hành" thì gán link
+        if (btn.innerText.toLowerCase().includes('đặt hàng')) {
+            btn.onclick = function() {
+                window.location.href = 'thanh-toan.html';
+            };
+        }
+    });
+});
+
 // ==========================================
 // PHẦN THÊM: CHỨC NĂNG TÌM KIẾM SẢN PHẨM
 // ==========================================
