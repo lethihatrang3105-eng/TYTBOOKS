@@ -150,7 +150,7 @@ body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; background-c
 .btn-buy-now-orange:hover { background-color: #d84b0f; }
 .dark-sidebar { flex: 1; }
 
-/* Nút sửa ✎ */
+/* Nút sửsa ✎ */
 .btn-edit-item {
     position: absolute;
     top: 10px;
