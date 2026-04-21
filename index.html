@@ -207,6 +207,60 @@
     </div>
 
     <main class="main-content">
+        <div style="max-width: 1200px; margin: 20px auto 40px; position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" id="home-banner">
+            
+            <div class="my-slide" style="display: block; animation: fadeBanner 1.5s;">
+                <img src="https://via.placeholder.com/1200x350/f26522/ffffff?text=TYTBOOKS+-+Dai+Tiec+Sach+Giam+Den+50%25" alt="Banner 1" style="width: 100%; display: block; object-fit: cover; height: 350px;">
+            </div>
+            
+            <div class="my-slide" style="display: none; animation: fadeBanner 1.5s;">
+                <img src="https://via.placeholder.com/1200x350/17a2b8/ffffff?text=Sach+Cong+Nghe+Thong+Tin+2.K24+-+Dong+Gia+99K" alt="Banner 2" style="width: 100%; display: block; object-fit: cover; height: 350px;">
+            </div>
+            
+            <div class="my-slide" style="display: none; animation: fadeBanner 1.5s;">
+                <img src="https://via.placeholder.com/1200x350/28a745/ffffff?text=Freeship+Moi+Don+Hang+Tai+DH+Hai+Phong" alt="Banner 3" style="width: 100%; display: block; object-fit: cover; height: 350px;">
+            </div>
+
+            <a onclick="manualMoveSlide(-1)" style="cursor: pointer; position: absolute; top: 50%; left: 15px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.3); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 20px; font-weight: bold; user-select: none; transition: 0.3s; text-decoration: none;">&#10094;</a>
+            <a onclick="manualMoveSlide(1)" style="cursor: pointer; position: absolute; top: 50%; right: 15px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.3); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 20px; font-weight: bold; user-select: none; transition: 0.3s; text-decoration: none;">&#10095;</a>
+            
+            <style>
+                @keyframes fadeBanner {
+                    from {opacity: .5} 
+                    to {opacity: 1}
+                }
+            </style>
+            
+            <script>
+                let currentSlideIndex = 0;
+                let bannerTimer;
+
+                function runBanner() {
+                    let slides = document.querySelectorAll(".my-slide");
+                    if(slides.length === 0) return;
+                    for (let i = 0; i < slides.length; i++) {
+                        slides[i].style.display = "none";  
+                    }
+                    currentSlideIndex++;
+                    if (currentSlideIndex > slides.length) {currentSlideIndex = 1}    
+                    slides[currentSlideIndex-1].style.display = "block";  
+                    bannerTimer = setTimeout(runBanner, 4000); 
+                }
+
+                function manualMoveSlide(n) {
+                    clearTimeout(bannerTimer); 
+                    let slides = document.querySelectorAll(".my-slide");
+                    currentSlideIndex += n - 1; 
+                    if (currentSlideIndex < 0) { currentSlideIndex = slides.length - 1; }
+                    runBanner(); 
+                }
+
+                // Khởi động
+                runBanner();
+            </script>
+        </div>
+        ```
+
         <section class="product-section">
             <div class="section-title">
                 <h2>SÁCH HAY</h2>
