@@ -654,3 +654,43 @@ window.registerWithEmail = function() {
             alert("Lỗi đăng ký: " + error.message);
         });
 };
+// ==========================================
+// ĐĂNG NHẬP BẰNG GOOGLE VÀ FACEBOOK
+// ==========================================
+window.loginWithGoogle = function() {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+            alert("🎉 Đăng nhập Google thành công!");
+            document.getElementById('authModal').style.display = 'none';
+            window.location.reload(); // Tải lại trang để cập nhật tên
+        })
+        .catch((error) => {
+            alert("Lỗi đăng nhập Google: " + error.message);
+        });
+};
+
+window.loginWithFacebook = function() {
+    const provider = new firebase.auth.FacebookAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+            alert("🎉 Đăng nhập Facebook thành công!");
+            document.getElementById('authModal').style.display = 'none';
+            window.location.reload();
+        })
+        .catch((error) => {
+            alert("Tính năng Facebook hiện chưa được cấu hình trên Firebase. Vui lòng dùng Google hoặc Email!");
+        });
+};
+
+// ==========================================
+// XỬ LÝ NÚT ĐĂNG XUẤT
+// ==========================================
+window.logoutUser = function() {
+    firebase.auth().signOut().then(() => {
+        alert("Đã đăng xuất thành công!");
+        window.location.reload();
+    }).catch((error) => {
+        alert("Lỗi đăng xuất: " + error.message);
+    });
+};
