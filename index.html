@@ -30,8 +30,8 @@
 
             <div class="user-actions" style="display: flex; align-items: center; gap: 30px;">
                 
-                <button id="btnOpenModal" class="btn-admin-add" style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 4px; font-weight: bold; cursor: pointer;">+ Đăng Sách Nhanh</button>
-                <button id="btnViewOrders" class="btn-admin-add" style="background-color: #17a2b8; display: none;" onclick="openOrderManager()">📦 Quản lý đơn hàng</button>
+                <button id="btnAdminAccess" class="btn-admin-add" style="background-color: #333; color: #fff; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="document.getElementById('adminHubModal').style.display='block'">⚙️ Admin Truy Cập</button>
+
                 <div style="display: flex; align-items: center; gap: 10px; color: #f26522;">
                     <span style="font-size: 28px;">🎧</span>
                     <div>
@@ -395,7 +395,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     
-    <script src="shop-logic.js"></script>
+    <script src="shop-logic.js?v=2"></script>
     
 <div id="editBookModal" class="modal" style="display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);">
     <div class="modal-content" style="background: #fff; margin: 5% auto; padding: 25px; width: 500px; border-radius: 8px; position: relative;">
@@ -482,7 +482,8 @@
             </div>
         </div>
     </div>
-    <div id="orderManagerModal" class="modal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);">
+
+<div id="orderManagerModal" class="modal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);">
     <div class="modal-content" style="background: #fff; margin: 3% auto; padding: 25px; width: 900px; border-radius: 8px; position: relative; max-height: 90vh; overflow-y: auto;">
         <span onclick="document.getElementById('orderManagerModal').style.display='none'" style="float: right; cursor: pointer; font-size: 28px; color: #888;">&times;</span>
         <h2 style="margin-bottom: 20px; color: #17a2b8; border-bottom: 2px solid #17a2b8; padding-bottom: 10px; display: inline-block;">📦 Quản Lý Đơn Hàng</h2>
@@ -491,5 +492,63 @@
         </div>
     </div>
 </div>
+
+<div id="bannerModal" class="modal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);">
+    <div class="modal-content" style="background: #fff; margin: 5% auto; padding: 25px; width: 500px; border-radius: 8px;">
+        <span onclick="document.getElementById('bannerModal').style.display='none'" style="float: right; cursor: pointer; font-size: 28px; color: #888;">&times;</span>
+        <h2 style="color: #C92127; margin-bottom: 20px; border-bottom: 2px solid #C92127; padding-bottom: 10px; display: inline-block;">🖼️ Cập nhật Banner</h2>
+        
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link Ảnh Banner 1:</label>
+            <input type="text" id="admin-banner-1" placeholder="Dán link ảnh 1 vào đây..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div class="input-group" style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link Ảnh Banner 2:</label>
+            <input type="text" id="admin-banner-2" placeholder="Dán link ảnh 2 vào đây..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        <div class="input-group" style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link Ảnh Banner 3:</label>
+            <input type="text" id="admin-banner-3" placeholder="Dán link ảnh 3 vào đây..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        </div>
+        
+        <button onclick="saveBannersToFirebase()" style="width: 100%; background: #28a745; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">LƯU BANNER</button>
+    </div>
+</div>
+
+<div id="adminHubModal" class="modal" style="display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);">
+    <div class="modal-content" style="background: #f4f6f9; margin: 5% auto; padding: 30px; width: 700px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+        <span onclick="document.getElementById('adminHubModal').style.display='none'" style="float: right; cursor: pointer; font-size: 28px; color: #555;">&times;</span>
+        <h2 style="color: #C92127; border-bottom: 2px solid #C92127; padding-bottom: 10px; margin-bottom: 25px; text-transform: uppercase;">⚙️ Trung Tâm Quản Trị Hệ Thống</h2>
+
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('addBookModal').style.display='block';">
+                <div style="font-size: 45px; margin-bottom: 15px;">📚</div>
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Đăng Sách Mới</h3>
+                <p style="font-size: 13px; color: #777; margin: 0;">Thêm sản phẩm mới vào kho sách</p>
+            </div>
+
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; openOrderManager();">
+                <div style="font-size: 45px; margin-bottom: 15px;">📦</div>
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Quản Lý Đơn Hàng</h3>
+                <p style="font-size: 13px; color: #777; margin: 0;">Xem, duyệt và xử lý đơn đặt hàng</p>
+            </div>
+
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('bannerModal').style.display='block';">
+                <div style="font-size: 45px; margin-bottom: 15px;">🖼️</div>
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Cấu Hình Banner</h3>
+                <p style="font-size: 13px; color: #777; margin: 0;">Đổi ảnh quảng cáo tự chạy ở trang chủ</p>
+            </div>
+
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="alert('Tính năng Thống kê doanh thu đang được phát triển và sẽ ra mắt ở phiên bản sau!');">
+                <div style="font-size: 45px; margin-bottom: 15px;">📊</div>
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Báo Cáo Thống Kê</h3>
+                <p style="font-size: 13px; color: #777; margin: 0;">Xem biểu đồ doanh thu và lượng truy cập</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

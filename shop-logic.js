@@ -224,24 +224,27 @@ window.logoutUser = function() {
     auth.signOut();
 };
 
-// Tự động đổi thanh Top-bar khi đăng nhập thành công
+// Phân quyền: Kiểm tra Admin để hiện nút "Admin Truy Cập"
 auth.onAuthStateChanged(user => {
-    const greeting = document.getElementById('user-greeting');
-    const btnLogin = document.getElementById('btn-show-login');
-    const btnRegister = document.getElementById('btn-show-register');
-    const btnLogout = document.getElementById('btn-logout');
+    const btnAdminAccess = document.getElementById('btnAdminAccess');
     
-    if (user) { // Đã đăng nhập
-        greeting.style.display = 'inline';
-        greeting.innerText = 'Xin chào, ' + (user.displayName || user.email);
-        btnLogin.style.display = 'none';
-        btnRegister.style.display = 'none';
-        btnLogout.style.display = 'inline';
-    } else { // Chưa đăng nhập
-        greeting.style.display = 'none';
-        btnLogin.style.display = 'inline';
-        btnRegister.style.display = 'inline';
-        btnLogout.style.display = 'none';
+    // Nếu đúng email Admin thì hiện nút
+    if (user && user.email === 'lethihatrang3105@gmail.com') {
+        if(btnAdminAccess) btnAdminAccess.style.display = 'inline-block';
+        
+        // Hiện các nút Xóa/Sửa ở dưới từng quyển sách
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        const editButtons = document.querySelectorAll('.btn-edit-item');
+        deleteButtons.forEach(btn => btn.style.display = 'inline-block');
+        editButtons.forEach(btn => btn.style.display = 'inline-block');
+    } else {
+        // Khách hàng thì giấu đi
+        if(btnAdminAccess) btnAdminAccess.style.display = 'none';
+        
+        const deleteButtons = document.querySelectorAll('.btn-delete');
+        const editButtons = document.querySelectorAll('.btn-edit-item');
+        deleteButtons.forEach(btn => btn.style.display = 'none');
+        editButtons.forEach(btn => btn.style.display = 'none');
     }
 });
 // ==========================================
@@ -271,31 +274,101 @@ function checkAdminPrivileges(user) {
     }
 }
 
-// Lắng nghe trạng thái đăng nhập để thực hiện ẩn/hiện ngay lập tức
+// ==========================================
+// 1. LẮNG NGHE TRẠNG THÁI ĐĂNG NHẬP & PHÂN QUYỀN
+// ==========================================
 auth.onAuthStateChanged(user => {
-    // Chạy kiểm tra mỗi khi trạng thái đăng nhập thay đổi
-    checkAdminPrivileges(user);
-});
+    const btnAdminAccess = document.getElementById('btnAdminAccess');
+    const btnLogin = document.getElementById('btn-show-login');
+    const btnRegister = document.getElementById('btn-show-register');
+    const btnLogout = document.getElementById('btn-logout');
+    const greeting = document.getElementById('user-greeting');
 
-// Vì các nút xóa được tạo ra sau khi tải dữ liệu từ Firebase, 
-// chúng ta cần chạy lại kiểm tra này sau khi danh sách sách đã hiện ra.
-// Sửa lại đoạn onSnapshot một chút để gọi hàm này:
-db.collection("books").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-    window.allBooks = []; // <--- THÊM DÒNG NÀY (Để xóa dữ liệu cũ mỗi khi cập nhật)
-    const bookGrid = document.getElementById('book-grid');
-    bookGrid.innerHTML = '';
+    if (user) {
+        // Đã đăng nhập: Hiện tên, giấu nút Đăng nhập
+        if(btnLogin) btnLogin.style.display = 'none';
+        if(btnRegister) btnRegister.style.display = 'none';
+        if(btnLogout) btnLogout.style.display = 'inline-block';
+        if(greeting) {
+            greeting.style.display = 'inline-block';
+            greeting.innerText = 'Xin chào, ' + (user.displayName || user.email);
+        }
 
-    querySnapshot.forEach((doc) => {
-        const book = doc.data();
-        book.id = doc.id;
-        window.allBooks.push(book); // <--- THÊM DÒNG NÀY (Để lưu sách vào bộ nhớ tìm kiếm)
+        // Kiểm tra nếu là Admin thì hiện nút Admin
+        if (user.email === 'lethihatrang3105@gmail.com') {
+            if(btnAdminAccess) btnAdminAccess.style.display = 'inline-block';
+            document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => btn.style.display = 'inline-block');
+        } else {
+            if(btnAdminAccess) btnAdminAccess.style.display = 'none';
+            document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => btn.style.display = 'none');
+        }
+    } else {
+        // Chưa đăng nhập: Bắt buộc giấu Admin, hiện nút Đăng nhập
+        if(btnLogin) btnLogin.style.display = 'inline-block';
+        if(btnRegister) btnRegister.style.display = 'inline-block';
+        if(btnLogout) btnLogout.style.display = 'none';
+        if(greeting) greeting.style.display = 'none';
         
-        // ... (Giữ nguyên đoạn code render giao diện cũ của bạn bên dưới)
-    });
-    
-    // Sau khi tải xong, nếu đang có từ khóa tìm kiếm thì lọc luôn
-    if (typeof executeSearch === 'function') executeSearch(); 
+        if(btnAdminAccess) btnAdminAccess.style.display = 'none';
+        document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => btn.style.display = 'none');
+    }
 });
+
+// ==========================================
+// 2. CHUYỂN ĐỔI FORM ĐĂNG NHẬP / ĐĂNG KÝ
+// ==========================================
+window.showLoginForm = function() {
+    const loginArea = document.getElementById('login-form-area');
+    const regArea = document.getElementById('register-form-area');
+    if(loginArea) loginArea.style.display = 'block';
+    if(regArea) regArea.style.display = 'none';
+    document.getElementById('auth-title').innerText = 'Đăng nhập';
+};
+
+window.showRegisterForm = function() {
+    const loginArea = document.getElementById('login-form-area');
+    const regArea = document.getElementById('register-form-area');
+    if(loginArea) loginArea.style.display = 'none';
+    if(regArea) regArea.style.display = 'block';
+    document.getElementById('auth-title').innerText = 'Đăng ký';
+};
+
+// ==========================================
+// 3. XỬ LÝ NÚT BẤM GỬI LÊN FIREBASE
+// ==========================================
+window.loginWithEmail = function() {
+    const email = document.getElementById('login-email').value;
+    const pass = document.getElementById('login-password').value;
+    if(!email || !pass) { alert("Vui lòng nhập đủ email và mật khẩu!"); return; }
+    
+    auth.signInWithEmailAndPassword(email, pass)
+        .then(() => {
+            alert("Đăng nhập thành công!");
+            document.getElementById('authModal').style.display = 'none';
+        })
+        .catch((error) => {
+            alert("Sai email hoặc mật khẩu. Vui lòng thử lại!");
+        });
+};
+
+window.registerWithEmail = function() {
+    const email = document.getElementById('reg-email').value;
+    const pass = document.getElementById('reg-password').value;
+    const name = document.getElementById('reg-name').value;
+    if(!email || !pass || !name) { alert("Vui lòng điền đầy đủ thông tin!"); return; }
+
+    auth.createUserWithEmailAndPassword(email, pass)
+        .then((userCredential) => {
+            return userCredential.user.updateProfile({ displayName: name });
+        })
+        .then(() => {
+            alert("Đăng ký thành công!");
+            document.getElementById('authModal').style.display = 'none';
+        })
+        .catch((error) => {
+            alert("Lỗi đăng ký: " + error.message);
+        });
+};
 // ==========================================
 // BỘ LỌC TÌM KIẾM CHUẨN (DÀNH CHO TYTBOOKS)
 // ==========================================
@@ -526,3 +599,58 @@ db.collection("books").onSnapshot(() => {
         }
     }, 300); // Chờ 0.3 giây sau khi tải xong sách để giấu nút
 });
+// ==========================================
+// CHUYỂN ĐỔI FORM ĐĂNG NHẬP / ĐĂNG KÝ
+// ==========================================
+window.showLoginForm = function() {
+    document.getElementById('login-form-area').style.display = 'block';
+    document.getElementById('register-form-area').style.display = 'none';
+    document.getElementById('auth-title').innerText = 'Đăng nhập';
+};
+
+window.showRegisterForm = function() {
+    document.getElementById('login-form-area').style.display = 'none';
+    document.getElementById('register-form-area').style.display = 'block';
+    document.getElementById('auth-title').innerText = 'Đăng ký tài khoản';
+};
+
+// ==========================================
+// XỬ LÝ FIREBASE ĐĂNG NHẬP / ĐĂNG KÝ BẰNG EMAIL
+// ==========================================
+window.loginWithEmail = function() {
+    const email = document.getElementById('login-email').value.trim();
+    const pass = document.getElementById('login-password').value;
+    if(!email || !pass) { alert("Vui lòng nhập đủ email và mật khẩu!"); return; }
+    
+    // Dùng thẳng firebase.auth() cực kỳ an toàn
+    firebase.auth().signInWithEmailAndPassword(email, pass)
+        .then(() => {
+            alert("🎉 Đăng nhập thành công!");
+            document.getElementById('authModal').style.display = 'none';
+            window.location.reload(); // Tải lại trang để hiện tên
+        })
+        .catch((error) => {
+            alert("Lỗi: Email hoặc mật khẩu không chính xác!");
+        });
+};
+
+window.registerWithEmail = function() {
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-password').value;
+    const name = document.getElementById('reg-name').value.trim();
+    if(!email || !pass || !name) { alert("Vui lòng điền đầy đủ thông tin!"); return; }
+
+    firebase.auth().createUserWithEmailAndPassword(email, pass)
+        .then((userCredential) => {
+            // Cập nhật tên hiển thị cho người dùng mới
+            return userCredential.user.updateProfile({ displayName: name });
+        })
+        .then(() => {
+            alert("🎉 Đăng ký thành công! Chào mừng " + name + " đến với TYTBOOKS");
+            document.getElementById('authModal').style.display = 'none';
+            window.location.reload();
+        })
+        .catch((error) => {
+            alert("Lỗi đăng ký: " + error.message);
+        });
+};
