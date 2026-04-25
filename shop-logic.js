@@ -1,6 +1,4 @@
 // 1. Dán Cấu hình Firebase của dự án TYTBOOKS vào đây
-// LƯU Ý: Bạn cần lấy đúng config của dự án tytbooks-b83b0 trong cài đặt Firebase
-// --- ĐOẠN CODE THÊM: TỰ ĐỘNG ĐẾM SỐ LƯỢNG GIỎ HÀNG CHO TRANG CHỦ ---
 function updateHeaderCartOnHome() {
     let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
     let totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -8,7 +6,7 @@ function updateHeaderCartOnHome() {
     if(cartText) cartText.innerText = totalItems + " sản phẩm";
 }
 updateHeaderCartOnHome();
-// -------------------------------------------------------------------
+
 const firebaseConfig = {
  apiKey: "AIzaSyBe6gOlb9CswH9IvwiDhw1__NZTWoohnWI",
   authDomain: "tytbooks-27460.firebaseapp.com",
@@ -18,29 +16,36 @@ const firebaseConfig = {
   appId: "1:1042581712598:web:4389f25a6c71e59c96a377",
   measurementId: "G-9LTPX47CY3"
 };
-// Khởi tạo Firebase
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 
 // -------------------------------------------------------------------
-// PHẦN 1: XỬ LÝ ĐÓNG/MỞ POPUP (MODAL) THÊM SÁCH
+// ĐOẠN MỚI: TỰ ĐỘNG ẨN "DANH MỤC NỔI BẬT" MÀ KHÔNG CẦN XÓA HTML
+// -------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+    const headers = document.querySelectorAll('h2');
+    headers.forEach(h2 => {
+        if(h2.innerText.trim().toUpperCase() === 'DANH MỤC NỔI BẬT') {
+            const parentDiv = h2.parentElement;
+            if(parentDiv) parentDiv.style.display = 'none'; // Giấu nó đi
+        }
+    });
+});
+
+// -------------------------------------------------------------------
+// PHẦN 1: XỬ LÝ ĐÓNG/MỞ POPUP (MODAL)
 // -------------------------------------------------------------------
 const modal = document.getElementById("addBookModal");
-const btnOpen = document.getElementById("btnOpenModal");
 const btnClose = document.getElementById("btnCloseModal");
 
-// Mở Popup khi bấm nút "+ Đăng Sách Nhanh"
-btnOpen.onclick = function() {
-    modal.style.display = "block";
-    document.getElementById('statusMsg').innerText = ""; // Xóa thông báo cũ
+if (btnClose) {
+    btnClose.onclick = function() {
+        modal.style.display = "none";
+    }
 }
 
-// Đóng Popup khi bấm dấu X
-btnClose.onclick = function() {
-    modal.style.display = "none";
-}
-
-// Đóng Popup khi click chuột ra ngoài vùng nền đen
 window.onclick = function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
@@ -48,416 +53,264 @@ window.onclick = function(event) {
 }
 
 // -------------------------------------------------------------------
-// PHẦN 2: LƯU SÁCH CÓ THÊM PHẦN DANH MỤC VÀ TÌNH TRẠNG
+// PHẦN 2: LƯU SÁCH MỚI (ĐÃ BỌC LỚP BẢO VỆ CHỐNG CRASH)
 // -------------------------------------------------------------------
-document.getElementById('addBookForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const btnSubmit = document.getElementById('btnSubmitForm');
-    btnSubmit.innerText = "ĐANG TẢI LÊN..."; btnSubmit.disabled = true;
+const formAddBook = document.getElementById('addBookForm');
+if (formAddBook) { // <-- Lớp bảo vệ: Chỉ chạy khi tìm thấy form trên trang
+    formAddBook.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btnSubmit = document.getElementById('btnSubmitForm');
+        btnSubmit.innerText = "ĐANG TẢI LÊN..."; btnSubmit.disabled = true;
 
-    db.collection("books").add({
-        title: document.getElementById('bookTitle').value,
-        author: document.getElementById('bookAuthor').value,
-        category: document.getElementById('bookCategory').value, 
-        status: document.getElementById('book-status').value, // <--- THÊM DÒNG NÀY: Lưu tình trạng khi đăng sách
-        price: Number(document.getElementById('bookPrice').value),
-        originalPrice: Number(document.getElementById('bookOriginalPrice').value),
-        publisher: document.getElementById('bookPublisher').value,
-        pages: Number(document.getElementById('bookPages').value),
-        image: document.getElementById('bookImage').value,
-        description: document.getElementById('bookDescription').value,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp() 
-    })
-    .then(() => {
-        document.getElementById('statusMsg').innerText = "✅ Thêm sách thành công!";
-        document.getElementById('statusMsg').style.color = "green";
-        document.getElementById('addBookForm').reset(); 
-        setTimeout(() => { modal.style.display = "none"; }, 1500);
-    })
-    .catch((error) => { /*...giữ nguyên phần báo lỗi...*/ })
-    .finally(() => { btnSubmit.innerText = "ĐĂNG SẢN PHẨM"; btnSubmit.disabled = false; });
-});
+        try {
+            let finalImageUrl = document.getElementById('bookImage').value.trim();
+            const fileInput = document.getElementById('bookImageFile');
 
-// -------------------------------------------------------------------
-// PHẦN 3: HIỂN THỊ VÀ LỌC SẢN PHẨM THEO DANH MỤC
-// -------------------------------------------------------------------
-const bookGrid = document.getElementById('book-grid');
-let allBooks = []; // Mảng chứa tất cả sách
-let currentFilter = 'all'; // Mặc định hiển thị tất cả
+            if (fileInput && fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append("image", fileInput.files[0]);
 
-// Lấy dữ liệu 1 lần từ Firebase
-db.collection("books").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
-    allBooks = []; // Reset mảng mỗi khi có dữ liệu mới
-    querySnapshot.forEach((doc) => {
-        allBooks.push({ id: doc.id, ...doc.data() });
+                const imgbbResponse = await fetch("https://api.imgbb.com/1/upload?key=DÁN_MÃ_API_CỦA_BẠN_VÀO_ĐÂY", {
+                    method: "POST",
+                    body: formData
+                });
+                
+                const imgbbData = await imgbbResponse.json();
+                if (imgbbData.success) {
+                    finalImageUrl = imgbbData.data.url; 
+                } else {
+                    throw new Error("Lỗi khi tải ảnh lên ImgBB!");
+                }
+            }
+
+            if (!finalImageUrl) {
+                alert("❌ Vui lòng chọn ảnh từ máy tính hoặc dán link URL!");
+                btnSubmit.innerText = "ĐĂNG SẢN PHẨM"; btnSubmit.disabled = false;
+                return;
+            }
+
+            await db.collection("books").add({
+                title: document.getElementById('bookTitle').value,
+                author: document.getElementById('bookAuthor').value,
+                category: document.getElementById('bookCategory').value, 
+                status: document.getElementById('book-status').value, 
+                price: Number(document.getElementById('bookPrice').value),
+                originalPrice: Number(document.getElementById('bookOriginalPrice').value),
+                publisher: document.getElementById('bookPublisher').value,
+                pages: Number(document.getElementById('bookPages').value),
+                image: finalImageUrl, 
+                description: document.getElementById('bookDescription').value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+
+            document.getElementById('statusMsg').innerText = "✅ Thêm sách thành công!";
+            document.getElementById('statusMsg').style.color = "green";
+            document.getElementById('addBookForm').reset(); 
+            if(fileInput) fileInput.value = ""; 
+            setTimeout(() => { modal.style.display = "none"; document.getElementById('statusMsg').innerText = ""; }, 1500);
+
+        } catch (error) {
+            console.error("Lỗi: ", error);
+            alert("Lỗi tải lên: " + error.message);
+        } finally {
+            btnSubmit.innerText = "ĐĂNG SẢN PHẨM"; btnSubmit.disabled = false;
+        }
     });
-    renderBooks(); // Gọi hàm in sách ra màn hình
+}
+
+// -------------------------------------------------------------------
+// PHẦN 3: HIỂN THỊ VÀ GOM NHÓM SẢN PHẨM THEO THỂ LOẠI (CÓ FLASH SALE)
+// -------------------------------------------------------------------
+window.allBooks = []; 
+const urlParams = new URLSearchParams(window.location.search);
+let currentFilter = urlParams.get('category') || 'all'; 
+let currentKeyword = urlParams.get('search') ? urlParams.get('search').toLowerCase() : ''; 
+let currentPriceFilter = 'all'; 
+// BIẾN MỚI: Nhận diện xem người dùng có bấm từ nút "Xem tất cả Flash Sale" không
+let isFlashSaleView = urlParams.get('flashsale') === 'true'; 
+
+db.collection("books").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
+    window.allBooks = []; 
+    querySnapshot.forEach((doc) => {
+        window.allBooks.push({ id: doc.id, ...doc.data() });
+    });
+    renderBooks(); 
 });
 
-// Hàm vẽ sách ra giao diện (Có lọc)
 function renderBooks() {
-    bookGrid.innerHTML = ''; 
+    const mainSection = document.querySelector('.product-section');
+    if (!mainSection) return;
+    mainSection.innerHTML = ''; 
 
-    // Lọc sách theo currentFilter
-const filteredBooks = currentFilter === 'all' 
-        ? allBooks 
-        : allBooks.filter(book => book.category === currentFilter);
+    const isProductsPage = window.location.pathname.includes('products.html') || window.location.pathname.includes('danh-sach-san-pham.html');
 
-    // Đổi tên Tiêu đề theo danh mục
-    const sectionTitle = document.querySelector('.section-title h2');
-    if(currentFilter === 'all') sectionTitle.innerText = 'TẤT CẢ SẢN PHẨM';
-    else if(currentFilter === 'Sách') sectionTitle.innerText = 'SÁCH - TRUYỆN TRANH';
-    else sectionTitle.innerText = currentFilter.toUpperCase();
+    let filteredBooks = window.allBooks;
 
-    // Nếu không có sách nào
+    // 1. LỌC FLASH SALE ƯU TIÊN
+    if (isProductsPage && isFlashSaleView) {
+        filteredBooks = filteredBooks.filter(book => book.flashSaleDiscount > 0);
+    } else {
+        // Lọc danh mục bình thường
+        if (currentFilter !== 'all') {
+            filteredBooks = filteredBooks.filter(book => book.category === currentFilter);
+        }
+    }
+
+    // 2. Lọc theo từ khóa
+    if (currentKeyword !== '') {
+        filteredBooks = filteredBooks.filter(book => (book.title || "").toLowerCase().includes(currentKeyword));
+    }
+
+    // 3. Lọc theo giá (Tính dựa trên GIÁ SAU KHI GIẢM nếu có Flash Sale)
+    if (currentPriceFilter !== 'all') {
+        filteredBooks = filteredBooks.filter(book => {
+            const discount = book.flashSaleDiscount || 0;
+            const p = book.price * (1 - discount / 100); 
+            if (currentPriceFilter === 'd100') return p < 100000;
+            if (currentPriceFilter === '100-200') return p >= 100000 && p <= 200000;
+            if (currentPriceFilter === '200-300') return p >= 200000 && p <= 300000;
+            if (currentPriceFilter === '300-400') return p >= 300000 && p <= 400000;
+            if (currentPriceFilter === 't400') return p > 400000;
+            return true;
+        });
+    }
+
     if (filteredBooks.length === 0) {
-        bookGrid.innerHTML = `<p style="grid-column: span 4; text-align: center; color: #d9534f; padding: 40px;">Chưa có sản phẩm nào trong danh mục này.</p>`;
+        let msg = currentKeyword !== "" ? `Không tìm thấy sách: "${currentKeyword}"` : "Chưa có sản phẩm nào phù hợp.";
+        mainSection.innerHTML = `<div class="section-title"><h2>KẾT QUẢ</h2></div><p style="grid-column: span 4; text-align: center; color: #105b4d; padding: 50px; font-weight: bold;">${msg}</p>`;
         return;
     }
 
-    // In danh sách đã lọc ra
-    filteredBooks.forEach((book) => {
-        const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(book.price);
-        const imageUrl = book.image ? book.image : 'https://via.placeholder.com/250x300?text=Chưa+có+ảnh';
+    // Gom nhóm sách
+    let groupedBooks = {};
+    if (isProductsPage) {
+        let title = 'TẤT CẢ SẢN PHẨM';
+        if (isFlashSaleView) title = '⚡ SÁCH ĐANG CHẠY FLASH SALE';
+        else if (currentKeyword) title = `TÌM KIẾM: '${currentKeyword.toUpperCase()}'`;
+        else if (currentFilter !== 'all') title = currentFilter.toUpperCase();
+        groupedBooks[title] = filteredBooks;
+    } else {
+        if (currentKeyword !== '') {
+            groupedBooks[`KẾT QUẢ TÌM KIẾM: '${currentKeyword.toUpperCase()}'`] = filteredBooks;
+        } else if (currentFilter !== 'all') {
+            groupedBooks[currentFilter] = filteredBooks;
+        } else {
+            filteredBooks.forEach(book => {
+                let cat = book.category || 'Chưa phân loại';
+                if (!groupedBooks[cat]) groupedBooks[cat] = [];
+                groupedBooks[cat].push(book);
+            });
+        }
+    }
 
-      const productHTML = `
-            <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'">
-                <button class="btn-delete" onclick="event.stopPropagation(); deleteBook('${book.id}')">✕</button>
-                
-                <button class="btn-edit-item" onclick="event.stopPropagation(); openEditModal('${book.id}')">✎</button>
+    for (const [category, books] of Object.entries(groupedBooks)) {
+        if (books.length === 0) continue;
+        let sectionTitle = category === 'Sách' ? 'SÁCH - TRUYỆN TRANH' : category;
 
-                <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 180px; object-fit: contain; margin-bottom: 10px;">
-                <h3 class="product-name">${book.title}</h3>
-                <div class="product-price"><span class="new-price">${formattedPrice}</span></div>
+        let groupHTML = `
+            <div class="section-title" style="margin-top: ${!isProductsPage && currentFilter === 'all' && currentKeyword === '' ? '40px' : '0'}; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: baseline;">
+                <h2 style="margin: 0; color: #105b4d; font-size: 20px; text-transform: uppercase;">${sectionTitle}</h2>
+                ${(!isProductsPage && currentFilter === 'all' && currentKeyword === '') ? `<a href="products.html?category=${encodeURIComponent(category)}" style="color: #007bff; text-decoration: none; font-size: 14px; font-weight: bold;">Xem tất cả ››</a>` : ''}
             </div>
+            <div class="product-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px;">
         `;
-        bookGrid.innerHTML += productHTML;
-    });
+
+        let displayBooks = (!isProductsPage && currentFilter === 'all' && currentKeyword === '') ? books.slice(0, 8) : books;
+
+        displayBooks.forEach((book) => {
+            // XỬ LÝ GIAO DIỆN NẾU SÁCH ĐƯỢC GIẢM GIÁ (Áp dụng cho mọi vị trí)
+            const discount = book.flashSaleDiscount || 0;
+            const finalPrice = book.price * (1 - discount / 100);
+            
+            const formatNewPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(finalPrice);
+            const formatOldPrice = discount > 0 ? new Intl.NumberFormat('vi-VN').format(book.price) + 'đ' : '';
+            const badgeHTML = discount > 0 ? `<div style="position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-weight: bold; font-size: 13px; padding: 4px 8px; border-radius: 4px; z-index: 2;">-${discount}%</div>` : '';
+            const imageUrl = book.image ? book.image : 'https://via.placeholder.com/250x300?text=Chưa+có+ảnh';
+
+            groupHTML += `
+                <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'" style="background: #fff; border-radius: 8px; padding: 12px; position: relative; cursor: pointer; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    ${badgeHTML}
+                    <div style="position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 10;">
+                        <button class="btn-edit-item" style="display: none; background: #007bff; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.2); padding: 0; line-height: 32px;" onclick="event.stopPropagation(); openEditModal('${book.id}')" title="Sửa">✎</button>
+                        <button class="btn-delete" style="display: none; background: #dc3545; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.2); padding: 0; line-height: 32px;" onclick="event.stopPropagation(); deleteBook('${book.id}')" title="Xóa">✕</button>
+                    </div>
+                    <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 180px; object-fit: contain; margin-bottom: 12px;">
+                    <h3 class="product-name" style="font-size: 14px; height: 40px; overflow: hidden; margin-bottom: 5px; color: #333;">${book.title}</h3>
+                    <div style="display: flex; flex-direction: column;">
+                        <span class="new-price" style="color: #d0021b; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
+                        <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${formatOldPrice}</span>
+                    </div>
+                </div>
+            `;
+        });
+        groupHTML += `</div>`;
+        mainSection.innerHTML += groupHTML;
+    }
+    checkAdminDisplay();
 }
 
 // -------------------------------------------------------------------
-// PHẦN 4: HÀM NHẬN LỆNH KHI BẤM VÀO MENU (Được gọi từ HTML)
+// PHẦN 4: HÀM CHUYỂN TRANG, TÌM KIẾM VÀ LỌC GIÁ
 // -------------------------------------------------------------------
 window.filterCategory = function(event, categoryName) {
-    event.preventDefault(); // Ngăn web bị nhảy vút lên đầu trang khi bấm
-    currentFilter = categoryName; // Đổi điều kiện lọc
-    renderBooks(); // Vẽ lại giao diện
-}
-// -------------------------------------------------------------------
-// PHẦN 5: HÀM XÓA SÁCH
-// -------------------------------------------------------------------
-window.deleteBook = function(event, bookId) {
-    // Lệnh này CỰC KỲ QUAN TRỌNG: Ngăn không cho sự kiện click lan ra thẻ div bên ngoài
-    // (Nếu không có lệnh này, khi bấm xóa web sẽ bị nhảy sang trang Chi tiết sản phẩm)
-    event.stopPropagation(); 
-
-    // Hiện hộp thoại xác nhận trước khi xóa thật
-    const isConfirm = confirm("Bạn có chắc chắn muốn xóa cuốn sách này không? Dữ liệu không thể khôi phục.");
-    
-    if (isConfirm) {
-        // Gọi lệnh xóa của Firebase
-        db.collection("books").doc(bookId).delete().then(() => {
-            alert("Đã xóa sách thành công!");
-            // Vì chúng ta đang dùng onSnapshot (Realtime), nên không cần viết code tải lại giao diện.
-            // Sách sẽ tự động biến mất ngay lập tức!
-        }).catch((error) => {
-            console.error("Lỗi khi xóa: ", error);
-            alert("Lỗi: Không thể xóa sách.");
-        });
+    if(event) event.preventDefault(); 
+    const isProductsPage = window.location.pathname.includes('products.html') || window.location.pathname.includes('danh-sach-san-pham.html');
+    if (!isProductsPage) {
+        window.location.href = `products.html?category=${encodeURIComponent(categoryName)}`;
+        return;
     }
+    currentFilter = categoryName; 
+    currentKeyword = ''; 
+    currentPriceFilter = 'all';
+    isFlashSaleView = false; // Tự động thoát chế độ flash sale khi khách bấm vào danh mục bên trái
+    const searchInput = document.querySelector('.search-bar input');
+    if (searchInput) searchInput.value = '';
+    window.history.pushState({}, '', `products.html?category=${encodeURIComponent(categoryName)}`);
+    renderBooks(); 
 }
 
-// ==========================================
-// PHẦN THÊM: CHỨC NĂNG ĐĂNG NHẬP / ĐĂNG KÝ
-// ==========================================
-const auth = firebase.auth();
-const googleProvider = new firebase.auth.GoogleAuthProvider();
-const facebookProvider = new firebase.auth.FacebookAuthProvider();
-
-// Đổi giao diện Popup
-window.showLoginForm = function() {
-    document.getElementById('auth-title').innerText = 'Đăng nhập';
-    document.getElementById('auth-separator-text').innerText = 'hoặc đăng nhập dùng email';
-    document.getElementById('login-form-area').style.display = 'block';
-    document.getElementById('register-form-area').style.display = 'none';
-};
-
-window.showRegisterForm = function() {
-    document.getElementById('auth-title').innerText = 'Đăng ký';
-    document.getElementById('auth-separator-text').innerText = 'hoặc đăng ký dùng email';
-    document.getElementById('login-form-area').style.display = 'none';
-    document.getElementById('register-form-area').style.display = 'block';
-};
-
-// Kết nối Google / Facebook / Email
-window.loginWithGoogle = function() {
-    auth.signInWithPopup(googleProvider).then(() => {
-        document.getElementById('authModal').style.display = 'none';
-    }).catch(error => alert('Lỗi: ' + error.message));
-};
-
-window.loginWithFacebook = function() {
-    auth.signInWithPopup(facebookProvider).then(() => {
-        document.getElementById('authModal').style.display = 'none';
-    }).catch(error => alert('Lỗi: ' + error.message));
-};
-window.loginWithEmail = function() {
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-password').value;
-    auth.signInWithEmailAndPassword(email, pass).then(() => {
-        document.getElementById('authModal').style.display = 'none';
-    }).catch(error => alert('Lỗi đăng nhập: Vui lòng kiểm tra lại Email/Mật khẩu.'));
-};
-
-window.registerWithEmail = function() {
-    const email = document.getElementById('reg-email').value;
-    const pass = document.getElementById('reg-password').value;
-    const name = document.getElementById('reg-name').value;
-    auth.createUserWithEmailAndPassword(email, pass).then(userCredential => {
-        return userCredential.user.updateProfile({ displayName: name });
-    }).then(() => {
-        document.getElementById('authModal').style.display = 'none';
-    }).catch(error => alert('Lỗi đăng ký: ' + error.message));
-};
-
-window.logoutUser = function() {
-    auth.signOut();
-};
-
-// Phân quyền: Kiểm tra Admin để hiện nút "Admin Truy Cập"
-auth.onAuthStateChanged(user => {
-    const btnAdminAccess = document.getElementById('btnAdminAccess');
-    
-    // Nếu đúng email Admin thì hiện nút
-    if (user && user.email === 'lethihatrang3105@gmail.com') {
-        if(btnAdminAccess) btnAdminAccess.style.display = 'inline-block';
-        
-        // Hiện các nút Xóa/Sửa ở dưới từng quyển sách
-        const deleteButtons = document.querySelectorAll('.btn-delete');
-        const editButtons = document.querySelectorAll('.btn-edit-item');
-        deleteButtons.forEach(btn => btn.style.display = 'inline-block');
-        editButtons.forEach(btn => btn.style.display = 'inline-block');
-    } else {
-        // Khách hàng thì giấu đi
-        if(btnAdminAccess) btnAdminAccess.style.display = 'none';
-        
-        const deleteButtons = document.querySelectorAll('.btn-delete');
-        const editButtons = document.querySelectorAll('.btn-edit-item');
-        deleteButtons.forEach(btn => btn.style.display = 'none');
-        editButtons.forEach(btn => btn.style.display = 'none');
-    }
-});
-// ==========================================
-// PHẦN THÊM: PHÂN QUYỀN ADMIN (GIẤU NÚT)
-// ==========================================
-
-// Hàm kiểm tra và ẩn/hiện nút
-function checkAdminPrivileges(user) {
-   // Thay thế nội dung trong hàm checkAdminPrivileges cũ bằng đoạn này:
-    const btnAddBook = document.getElementById('btnOpenModal');
-    const btnViewOrders = document.getElementById('btnViewOrders'); // Bổ sung
-    const deleteButtons = document.querySelectorAll('.btn-delete');
-    const editButtons = document.querySelectorAll('.btn-edit-item');
-
-    const adminEmail = 'lethihatrang3105@gmail.com'; 
-
-    if (user && user.email === adminEmail) {
-        if (btnAddBook) btnAddBook.style.display = 'block';
-        if (btnViewOrders) btnViewOrders.style.display = 'block'; // Admin thấy nút
-        deleteButtons.forEach(btn => btn.style.display = 'flex');
-        editButtons.forEach(btn => btn.style.display = 'flex'); 
-    } else {
-        if (btnAddBook) btnAddBook.style.display = 'none';
-        if (btnViewOrders) btnViewOrders.style.display = 'none'; // Khách không thấy
-        deleteButtons.forEach(btn => btn.style.display = 'none');
-        editButtons.forEach(btn => btn.style.display = 'none');
-    }
-}
-
-// ==========================================
-// 1. LẮNG NGHE TRẠNG THÁI ĐĂNG NHẬP & PHÂN QUYỀN
-// ==========================================
-auth.onAuthStateChanged(user => {
-    const btnAdminAccess = document.getElementById('btnAdminAccess');
-    const btnLogin = document.getElementById('btn-show-login');
-    const btnRegister = document.getElementById('btn-show-register');
-    const btnLogout = document.getElementById('btn-logout');
-    const greeting = document.getElementById('user-greeting');
-
-    if (user) {
-        // Đã đăng nhập: Hiện tên, giấu nút Đăng nhập
-        if(btnLogin) btnLogin.style.display = 'none';
-        if(btnRegister) btnRegister.style.display = 'none';
-        if(btnLogout) btnLogout.style.display = 'inline-block';
-        if(greeting) {
-            greeting.style.display = 'inline-block';
-            greeting.innerText = 'Xin chào, ' + (user.displayName || user.email);
-        }
-
-        // Kiểm tra nếu là Admin thì hiện nút Admin
-        if (user.email === 'lethihatrang3105@gmail.com') {
-            if(btnAdminAccess) btnAdminAccess.style.display = 'inline-block';
-            document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => btn.style.display = 'inline-block');
-        } else {
-            if(btnAdminAccess) btnAdminAccess.style.display = 'none';
-            document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => btn.style.display = 'none');
-        }
-    } else {
-        // Chưa đăng nhập: Bắt buộc giấu Admin, hiện nút Đăng nhập
-        if(btnLogin) btnLogin.style.display = 'inline-block';
-        if(btnRegister) btnRegister.style.display = 'inline-block';
-        if(btnLogout) btnLogout.style.display = 'none';
-        if(greeting) greeting.style.display = 'none';
-        
-        if(btnAdminAccess) btnAdminAccess.style.display = 'none';
-        document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => btn.style.display = 'none');
-    }
-});
-
-// ==========================================
-// 2. CHUYỂN ĐỔI FORM ĐĂNG NHẬP / ĐĂNG KÝ
-// ==========================================
-window.showLoginForm = function() {
-    const loginArea = document.getElementById('login-form-area');
-    const regArea = document.getElementById('register-form-area');
-    if(loginArea) loginArea.style.display = 'block';
-    if(regArea) regArea.style.display = 'none';
-    document.getElementById('auth-title').innerText = 'Đăng nhập';
-};
-
-window.showRegisterForm = function() {
-    const loginArea = document.getElementById('login-form-area');
-    const regArea = document.getElementById('register-form-area');
-    if(loginArea) loginArea.style.display = 'none';
-    if(regArea) regArea.style.display = 'block';
-    document.getElementById('auth-title').innerText = 'Đăng ký';
-};
-
-// ==========================================
-// 3. XỬ LÝ NÚT BẤM GỬI LÊN FIREBASE
-// ==========================================
-window.loginWithEmail = function() {
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-password').value;
-    if(!email || !pass) { alert("Vui lòng nhập đủ email và mật khẩu!"); return; }
-    
-    auth.signInWithEmailAndPassword(email, pass)
-        .then(() => {
-            alert("Đăng nhập thành công!");
-            document.getElementById('authModal').style.display = 'none';
-        })
-        .catch((error) => {
-            alert("Sai email hoặc mật khẩu. Vui lòng thử lại!");
-        });
-};
-
-window.registerWithEmail = function() {
-    const email = document.getElementById('reg-email').value;
-    const pass = document.getElementById('reg-password').value;
-    const name = document.getElementById('reg-name').value;
-    if(!email || !pass || !name) { alert("Vui lòng điền đầy đủ thông tin!"); return; }
-
-    auth.createUserWithEmailAndPassword(email, pass)
-        .then((userCredential) => {
-            return userCredential.user.updateProfile({ displayName: name });
-        })
-        .then(() => {
-            alert("Đăng ký thành công!");
-            document.getElementById('authModal').style.display = 'none';
-        })
-        .catch((error) => {
-            alert("Lỗi đăng ký: " + error.message);
-        });
-};
-// ==========================================
-// BỘ LỌC TÌM KIẾM CHUẨN (DÀNH CHO TYTBOOKS)
-// ==========================================
 window.executeSearch = function() {
-    // 1. Lấy ô nhập liệu và từ khóa (Xử lý cả chữ hoa/thường)
     const searchInput = document.querySelector('.search-bar input');
     if (!searchInput) return;
     const keyword = searchInput.value.trim().toLowerCase();
-    
-    const bookGrid = document.getElementById('book-grid');
-    if (!bookGrid || !window.allBooks) return;
-
-    // 2. Lọc danh sách sách
-    const filteredBooks = window.allBooks.filter(book => {
-        const title = (book.title || "").toLowerCase();
-        return title.includes(keyword);
-    });
-
-    // 3. Cập nhật tiêu đề (TẤT CẢ SẢN PHẨM -> KẾT QUẢ TÌM KIẾM)
-    const titleSection = document.querySelector('.section-title h2');
-    if (titleSection) {
-        titleSection.innerText = keyword === "" ? "TẤT CẢ SẢN PHẨM" : "KẾT QUẢ TÌM KIẾM CHO: '" + keyword.toUpperCase() + "'";
-    }
-
-    // 4. Vẽ lại lưới sản phẩm chỉ với những cuốn khớp từ khóa
-    bookGrid.innerHTML = '';
-    
-    if (filteredBooks.length === 0) {
-        bookGrid.innerHTML = `<p style="grid-column: span 4; text-align: center; padding: 50px; color: #d9534f; font-weight: bold;">Rất tiếc, không tìm thấy sách: "${keyword}"</p>`;
+    const isProductsPage = window.location.pathname.includes('products.html') || window.location.pathname.includes('danh-sach-san-pham.html');
+    if (!isProductsPage) {
+        window.location.href = `products.html?search=${encodeURIComponent(keyword)}`;
         return;
     }
-
-    filteredBooks.forEach(book => {
-        const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(book.price);
-        const imageUrl = book.image || 'https://via.placeholder.com/250x300';
-        
-        // Vẽ lại thẻ sản phẩm (Giữ nguyên cấu trúc bạn đang có)
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        card.onclick = () => window.location.href = `detail.html?id=${book.id}`;
-        card.innerHTML = `
-            <button class="btn-delete" onclick="event.stopPropagation(); deleteBook('${book.id}')">✕</button>
-            <img src="${imageUrl}" alt="${book.title}">
-            <h3 class="product-name">${book.title}</h3>
-            <div class="product-price"><span class="new-price">${formattedPrice}</span></div>
-        `;
-        bookGrid.appendChild(card);
-    });
+    currentKeyword = keyword;
+    currentFilter = 'all'; 
+    currentPriceFilter = 'all';
+    isFlashSaleView = false; 
+    window.history.pushState({}, '', `products.html?search=${encodeURIComponent(keyword)}`);
+    renderBooks();
 };
 
-// Gắn sự kiện: Gõ chữ đến đâu lọc đến đó + Bấm nút kính lúp
 document.addEventListener('DOMContentLoaded', () => {
     const input = document.querySelector('.search-bar input');
     const btn = document.querySelector('.search-bar button');
-
     if (input) {
-        input.addEventListener('input', window.executeSearch); // Tìm kiếm ngay khi đang gõ
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') window.executeSearch();
-        });
+        input.addEventListener('input', window.executeSearch); 
+        input.addEventListener('keypress', (e) => { if (e.key === 'Enter') window.executeSearch(); });
     }
     if (btn) btn.addEventListener('click', window.executeSearch);
 });
+
+window.filterByPrice = function(rangeValue) {
+    currentPriceFilter = rangeValue;
+    renderBooks();
+}
 // ==========================================
-// HÀM XỬ LÝ XÓA SÁCH TRÊN FIREBASE
+// HÀM XỬ LÝ XÓA SÁCH & SỬA SÁCH 
 // ==========================================
 window.deleteBook = function(id) {
-    // 1. Hiện thông báo xác nhận để tránh bấm nhầm
     if (confirm("Bạn có chắc chắn muốn xóa cuốn sách này không? Hành động này không thể hoàn tác!")) {
-        
-        // 2. Gọi lệnh xóa lên Firebase Firestore
         db.collection("books").doc(id).delete()
-        .then(() => {
-            // Xóa thành công, thông báo cho người dùng
-            alert("Đã xóa sách khỏi hệ thống thành công!");
-            
-            // Lưu ý: Vì bạn đang dùng .onSnapshot, trang web sẽ tự động 
-            // cập nhật lại lưới sản phẩm mà không cần bạn phải F5.
-        })
-        .catch((error) => {
-            console.error("Lỗi khi xóa sách: ", error);
-            alert("Không thể xóa sách. Có thể do lỗi kết nối hoặc quyền hạn!");
-        });
+        .then(() => alert("Đã xóa sách khỏi hệ thống thành công!"))
+        .catch((error) => alert("Không thể xóa sách. Có thể do lỗi kết nối hoặc quyền hạn!"));
     }
 };
 
-// --- LOGIC SỬA SÁCH (CHỈ THÊM) ---
-
-// 1. Hàm lấy dữ liệu cũ và hiện modal
 window.openEditModal = function(id) {
     db.collection("books").doc(id).get().then((doc) => {
         if (doc.exists) {
@@ -467,46 +320,78 @@ window.openEditModal = function(id) {
             document.getElementById('edit-book-author').value = book.author || "";
             document.getElementById('edit-book-price').value = book.price || 0;
             document.getElementById('edit-book-category').value = book.category || "";
-            document.getElementById('edit-book-status').value = book.status || "Còn hàng"; // <--- THÊM DÒNG NÀY: Lấy tình trạng cũ
+            document.getElementById('edit-book-status').value = book.status || "Còn hàng"; 
             document.getElementById('edit-book-image').value = book.image || "";
             document.getElementById('edit-book-description').value = book.description || "";
+            
+            const fileInput = document.getElementById('edit-book-image-file');
+            if(fileInput) fileInput.value = "";
             
             document.getElementById('editBookModal').style.display = 'block';
         }
     });
 };
 
-// 2. Hàm lưu dữ liệu mới lên Firebase
-window.updateBookInFirebase = function() {
+window.updateBookInFirebase = async function() {
     const id = document.getElementById('edit-book-id').value;
-    const newData = {
-        title: document.getElementById('edit-book-title').value,
-        author: document.getElementById('edit-book-author').value,
-        price: Number(document.getElementById('edit-book-price').value),
-        category: document.getElementById('edit-book-category').value,
-        status: document.getElementById('edit-book-status').value, // <--- THÊM DÒNG NÀY: Lưu lại tình trạng mới
-        image: document.getElementById('edit-book-image').value,
-        description: document.getElementById('edit-book-description').value
-    };
+    const btnSave = document.querySelector('#editBookModal button');
+    const oldText = btnSave.innerText;
+    btnSave.innerText = "ĐANG LƯU..."; btnSave.disabled = true;
 
-    db.collection("books").doc(id).update(newData).then(() => {
+    try {
+        let finalImageUrl = document.getElementById('edit-book-image').value.trim();
+        const fileInput = document.getElementById('edit-book-image-file');
+
+        if (fileInput && fileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+
+            const imgbbResponse = await fetch("https://api.imgbb.com/1/upload?key=DÁN_MÃ_API_CỦA_BẠN_VÀO_ĐÂY", {
+                method: "POST",
+                body: formData
+            });
+            
+            const imgbbData = await imgbbResponse.json();
+            if (imgbbData.success) {
+                finalImageUrl = imgbbData.data.url;
+            } else {
+                throw new Error("Lỗi tải ảnh lên ImgBB!");
+            }
+        }
+
+        const newData = {
+            title: document.getElementById('edit-book-title').value,
+            author: document.getElementById('edit-book-author').value,
+            price: Number(document.getElementById('edit-book-price').value),
+            category: document.getElementById('edit-book-category').value,
+            status: document.getElementById('edit-book-status').value, 
+            image: finalImageUrl,
+            description: document.getElementById('edit-book-description').value
+        };
+
+        await db.collection("books").doc(id).update(newData);
         alert("Cập nhật thành công!");
         document.getElementById('editBookModal').style.display = 'none';
-    }).catch(err => alert("Lỗi: " + err));
+        if(fileInput) fileInput.value = "";
+    } catch (err) {
+        alert("Lỗi: " + err.message);
+    } finally {
+        btnSave.innerText = oldText; btnSave.disabled = false;
+    }
 };
+
 // ==========================================
-// HỆ THỐNG QUẢN LÝ ĐƠN HÀNG (CHỈ ADMIN)
+// HỆ THỐNG QUẢN LÝ ĐƠN HÀNG
 // ==========================================
 window.openOrderManager = function() {
     document.getElementById('orderManagerModal').style.display = 'block';
     const orderListDiv = document.getElementById('admin-orders-list');
-    orderListDiv.innerHTML = '<p style="text-align: center; color: #666;">Đang tải dữ liệu...</p>';
+    orderListDiv.innerHTML = '<p style="text-align: center; color: #666; font-weight: bold;">Đang lấy dữ liệu từ hệ thống...</p>';
 
-    // Kéo đơn hàng mới nhất về
     db.collection("orders").orderBy("createdAt", "desc").get().then((snapshot) => {
         orderListDiv.innerHTML = '';
         if (snapshot.empty) {
-            orderListDiv.innerHTML = '<p style="text-align:center; color:red;">Chưa có đơn hàng nào.</p>';
+            orderListDiv.innerHTML = '<p style="text-align:center; color:#d9534f; font-weight: bold;">Chưa có đơn hàng nào cần xử lý.</p>';
             return;
         }
 
@@ -514,48 +399,49 @@ window.openOrderManager = function() {
             const order = doc.data();
             const orderId = doc.id;
             
-            // Xử lý ngày giờ
             let dateStr = "Chưa rõ thời gian";
             if (order.createdAt) {
                 const dateObj = order.createdAt.toDate();
                 dateStr = dateObj.toLocaleDateString('vi-VN') + " " + dateObj.toLocaleTimeString('vi-VN');
             }
 
-            // Xử lý danh sách sách khách mua
             let itemsHTML = '';
             (order.items || []).forEach(item => {
-                itemsHTML += `<li>- ${item.quantity || 1} x <strong>${item.title}</strong></li>`;
+                itemsHTML += `<li style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;">- ${item.quantity || 1} x <strong style="color: #333;">${item.title}</strong></li>`;
             });
 
-            // Tổng tiền
             const formatPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(order.totalAmount || 0);
-            
-            // Màu sắc trạng thái
-            let statusColor = order.status === "Đã giao" ? "green" : "#f26522";
+            let statusColor = order.status === "Đã giao" ? "#28a745" : "#f26522"; 
 
             const orderCard = `
-                <div style="border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-bottom: 15px; background: #fafafa; position: relative;">
-                    <div style="display:flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px;">
-                        <span style="font-size: 13px; color: #666;">Ngày đặt: <strong>${dateStr}</strong></span>
-                        <span style="font-size: 13px; font-weight: bold; color: ${statusColor}; background: #fff; padding: 2px 8px; border: 1px solid ${statusColor}; border-radius: 12px;">${order.status}</span>
+                <div style="border: 1px solid #eaeaea; border-radius: 12px; padding: 20px; margin-bottom: 20px; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                    <div style="display:flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #f1f1f1; padding-bottom: 15px; margin-bottom: 15px;">
+                        <span style="font-size: 14px; color: #555;">Ngày đặt: <strong>${dateStr}</strong></span>
+                        <span style="font-size: 13px; font-weight: bold; color: ${statusColor}; background: #fff; padding: 5px 15px; border: 2px solid ${statusColor}; border-radius: 20px;">${order.status}</span>
                     </div>
-                    <div style="display: flex; gap: 20px;">
-                        <div style="flex: 1; border-right: 1px solid #eee;">
-                            <p style="margin-bottom: 5px;">👤 Khách: <strong>${order.customerName}</strong></p>
-                            <p style="margin-bottom: 5px;">📞 SĐT: <strong>${order.customerPhone}</strong></p>
-                            <p style="margin-bottom: 5px; font-size: 13px;">📍 Đ/c: ${order.customerAddress}</p>
-                            <p style="margin-bottom: 5px; font-size: 13px; color:#888;">📝 Ghi chú: ${order.note || 'Không có'}</p>
+                    
+                    <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 250px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #eee;">
+                            <p style="margin: 0 0 10px 0; font-size: 14px;">👤 Khách: <strong style="font-size: 16px; color: #333;">${order.customerName}</strong></p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px;">📞 SĐT: <strong>${order.customerPhone}</strong></p>
+                            <p style="margin: 0 0 10px 0; font-size: 14px;">📍 Đ/c: ${order.customerAddress}</p>
+                            <p style="margin: 0; font-size: 14px; color:#d9534f; font-style: italic;">📝 Ghi chú: ${order.note || 'Không có'}</p>
                         </div>
-                        <div style="flex: 1;">
-                            <p style="font-weight: bold; margin-bottom: 5px;">Sản phẩm đặt mua:</p>
-                            <ul style="list-style: none; padding: 0; font-size: 13px; margin-bottom: 10px;">
-                                ${itemsHTML}
-                            </ul>
-                            <p style="font-size: 16px;">Tổng tiền: <strong style="color: #d9534f;">${formatPrice}</strong></p>
+                        
+                        <div style="flex: 1.5; min-width: 300px; display: flex; flex-direction: column;">
+                            <p style="font-weight: bold; margin: 0 0 10px 0; font-size: 15px; color: #333;">Sản phẩm đặt mua:</p>
+                            <div style="background: #fff; border: 1px solid #eee; padding: 12px; border-radius: 8px; max-height: 120px; overflow-y: auto; margin-bottom: 15px;">
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                                    ${itemsHTML}
+                                </ul>
+                            </div>
                             
-                            <div style="margin-top: 15px;">
-                                <button onclick="markOrderDone('${orderId}')" style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;">✔ Đánh dấu Đã giao</button>
-                                <button onclick="deleteOrder('${orderId}')" style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 5px;">🗑 Hủy đơn</button>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                                <p style="font-size: 16px; margin: 0;">Tổng tiền: <strong style="color: #C92127; font-size: 20px;">${formatPrice}</strong></p>
+                                <div style="display: flex; gap: 10px;">
+                                    <button onclick="markOrderDone('${orderId}')" style="background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; box-shadow: 0 2px 4px rgba(40,167,69,0.3);">✔ Đã giao</button>
+                                    <button onclick="deleteOrder('${orderId}')" style="background: #dc3545; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; box-shadow: 0 2px 4px rgba(220,53,69,0.3);">🗑 Hủy đơn</button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -564,41 +450,76 @@ window.openOrderManager = function() {
             orderListDiv.innerHTML += orderCard;
         });
     }).catch(err => {
-        orderListDiv.innerHTML = '<p style="color:red;">Lỗi tải dữ liệu: ' + err.message + '</p>';
+        orderListDiv.innerHTML = '<p style="color:red; text-align:center;">Lỗi tải dữ liệu: ' + err.message + '</p>';
     });
 };
 
-// Hàm cập nhật trạng thái thành Đã Giao
 window.markOrderDone = function(orderId) {
     if(confirm("Xác nhận đơn hàng này ĐÃ GIAO thành công?")) {
         db.collection("orders").doc(orderId).update({ status: "Đã giao" }).then(() => {
             alert("Đã cập nhật trạng thái!");
-            openOrderManager(); // Tải lại danh sách
+            openOrderManager(); 
         });
     }
 };
 
-// Hàm xóa đơn hàng
 window.deleteOrder = function(orderId) {
     if(confirm("Bạn có chắc chắn muốn XÓA/HỦY đơn hàng này? Khách hàng sẽ buồn đó nha!")) {
         db.collection("orders").doc(orderId).delete().then(() => {
             alert("Đã xóa đơn hàng.");
-            openOrderManager(); // Tải lại danh sách
+            openOrderManager(); 
         });
     }
 };
-// ĐOẠN CODE THÊM VÀO CUỐI CÙNG: ĐẢM BẢO ẨN NÚT XÓA VÀ SỬA VỚI KHÁCH HÀNG
-db.collection("books").onSnapshot(() => {
-    setTimeout(() => {
-        const user = firebase.auth().currentUser;
-        // Kiểm tra nếu chưa đăng nhập, hoặc email không phải Admin thì ẩn nút đi
-        if (!user || user.email !== 'lethihatrang3105@gmail.com') {
-            document.querySelectorAll('.btn-delete, .btn-edit-item').forEach(btn => {
-                btn.style.display = 'none';
-            });
+
+// ==========================================
+// PHẦN THÊM: PHÂN QUYỀN GIAO DIỆN & LẮNG NGHE ĐĂNG NHẬP
+// ==========================================
+function checkAdminDisplay() {
+    const user = auth.currentUser;
+    const btnAdminAccess = document.getElementById('btnAdminAccess');
+    const deleteButtons = document.querySelectorAll('.btn-delete');
+    const editButtons = document.querySelectorAll('.btn-edit-item');
+
+    if (user && user.email === 'lethihatrang3105@gmail.com') {
+        if(btnAdminAccess) btnAdminAccess.style.display = 'inline-block';
+        deleteButtons.forEach(btn => btn.style.display = 'inline-block');
+        editButtons.forEach(btn => btn.style.display = 'inline-block');
+    } else {
+        if(btnAdminAccess) btnAdminAccess.style.display = 'none';
+        deleteButtons.forEach(btn => btn.style.display = 'none');
+        editButtons.forEach(btn => btn.style.display = 'none');
+    }
+}
+
+auth.onAuthStateChanged(user => {
+    const btnLogin = document.getElementById('btn-show-login');
+    const btnRegister = document.getElementById('btn-show-register');
+    const btnLogout = document.getElementById('btn-logout');
+    const greeting = document.getElementById('user-greeting');
+
+    if (user) {
+        if(btnLogin) btnLogin.style.display = 'none';
+        if(btnRegister) btnRegister.style.display = 'none';
+        if(btnLogout) btnLogout.style.display = 'inline-block';
+        if(greeting) {
+            greeting.style.display = 'inline-block';
+            greeting.innerText = 'Xin chào, ' + (user.displayName || user.email);
         }
-    }, 300); // Chờ 0.3 giây sau khi tải xong sách để giấu nút
+    } else {
+        if(btnLogin) btnLogin.style.display = 'inline-block';
+        if(btnRegister) btnRegister.style.display = 'inline-block';
+        if(btnLogout) btnLogout.style.display = 'none';
+        if(greeting) greeting.style.display = 'none';
+    }
+
+    checkAdminDisplay();
 });
+
+db.collection("books").onSnapshot(() => {
+    setTimeout(checkAdminDisplay, 300); 
+});
+
 // ==========================================
 // CHUYỂN ĐỔI FORM ĐĂNG NHẬP / ĐĂNG KÝ
 // ==========================================
@@ -614,20 +535,16 @@ window.showRegisterForm = function() {
     document.getElementById('auth-title').innerText = 'Đăng ký tài khoản';
 };
 
-// ==========================================
-// XỬ LÝ FIREBASE ĐĂNG NHẬP / ĐĂNG KÝ BẰNG EMAIL
-// ==========================================
 window.loginWithEmail = function() {
     const email = document.getElementById('login-email').value.trim();
     const pass = document.getElementById('login-password').value;
     if(!email || !pass) { alert("Vui lòng nhập đủ email và mật khẩu!"); return; }
     
-    // Dùng thẳng firebase.auth() cực kỳ an toàn
     firebase.auth().signInWithEmailAndPassword(email, pass)
         .then(() => {
             alert("🎉 Đăng nhập thành công!");
             document.getElementById('authModal').style.display = 'none';
-            window.location.reload(); // Tải lại trang để hiện tên
+            window.location.reload(); 
         })
         .catch((error) => {
             alert("Lỗi: Email hoặc mật khẩu không chính xác!");
@@ -642,7 +559,6 @@ window.registerWithEmail = function() {
 
     firebase.auth().createUserWithEmailAndPassword(email, pass)
         .then((userCredential) => {
-            // Cập nhật tên hiển thị cho người dùng mới
             return userCredential.user.updateProfile({ displayName: name });
         })
         .then(() => {
@@ -654,16 +570,14 @@ window.registerWithEmail = function() {
             alert("Lỗi đăng ký: " + error.message);
         });
 };
-// ==========================================
-// ĐĂNG NHẬP BẰNG GOOGLE VÀ FACEBOOK
-// ==========================================
+
 window.loginWithGoogle = function() {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
         .then((result) => {
             alert("🎉 Đăng nhập Google thành công!");
             document.getElementById('authModal').style.display = 'none';
-            window.location.reload(); // Tải lại trang để cập nhật tên
+            window.location.reload(); 
         })
         .catch((error) => {
             alert("Lỗi đăng nhập Google: " + error.message);
@@ -683,9 +597,6 @@ window.loginWithFacebook = function() {
         });
 };
 
-// ==========================================
-// XỬ LÝ NÚT ĐĂNG XUẤT
-// ==========================================
 window.logoutUser = function() {
     firebase.auth().signOut().then(() => {
         alert("Đã đăng xuất thành công!");
@@ -693,4 +604,374 @@ window.logoutUser = function() {
     }).catch((error) => {
         alert("Lỗi đăng xuất: " + error.message);
     });
+};
+
+// ==========================================
+// HỆ THỐNG QUẢN LÝ BANNER ĐỘNG (LÊN TỚI 10 ẢNH)
+// ==========================================
+db.collection("config").doc("homepage").onSnapshot((doc) => {
+    if (doc.exists) {
+        const data = doc.data();
+        const validLinks = []; 
+
+        for (let i = 1; i <= 10; i++) {
+            const link = data[`banner${i}`];
+            if (link && link.trim() !== "") {
+                validLinks.push(link.trim());
+            }
+            
+            const inputUrlField = document.getElementById(`admin-banner-url-${i}`);
+            if (inputUrlField) {
+                inputUrlField.value = link || '';
+            }
+        }
+
+        const bannerWrapper = document.getElementById('home-banner');
+        if (bannerWrapper) {
+            document.querySelectorAll('.my-slide').forEach(el => el.remove());
+
+            if (validLinks.length === 0) {
+                validLinks.push("https://theme.hstatic.net/200000343865/1001052087/14/slide_1_img.jpg?v=480");
+            }
+
+            validLinks.reverse().forEach((link) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'my-slide';
+                slideDiv.style.display = 'none';
+                slideDiv.style.animation = 'fadeBanner 1.5s';
+                slideDiv.style.height = '100%';
+                slideDiv.innerHTML = `<img src="${link}" style="width: 100%; height: 100%; display: block; object-fit: cover;">`;
+                bannerWrapper.prepend(slideDiv);
+            });
+
+            const newSlides = document.querySelectorAll('.my-slide');
+            if(newSlides.length > 0) {
+                newSlides[0].style.display = 'block';
+            }
+            
+            if(typeof currentSlideIndex !== 'undefined') {
+                currentSlideIndex = 0;
+            }
+        }
+    }
+});
+
+window.saveBannersToFirebase = async function() {
+    const btnSave = document.querySelector('#bannerModal button');
+    if (btnSave) {
+        btnSave.innerText = "ĐANG TẢI ẢNH LÊN (Vui lòng đợi)...";
+        btnSave.disabled = true;
+    }
+
+    const bannerData = {};
+    const imgbbApiKey = "DÁN_MÃ_API_CỦA_BẠN_VÀO_ĐÂY"; 
+
+    try {
+        for (let i = 1; i <= 10; i++) {
+            const fileInput = document.getElementById(`admin-banner-file-${i}`);
+            const urlInput = document.getElementById(`admin-banner-url-${i}`);
+            let finalUrl = "";
+
+            if (fileInput && fileInput.files.length > 0) {
+                const formData = new FormData();
+                formData.append("image", fileInput.files[0]);
+
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    finalUrl = data.data.url;
+                } else {
+                    throw new Error(`Lỗi tải ảnh Banner ${i} lên ImgBB!`);
+                }
+            } else if (urlInput && urlInput.value.trim() !== "") {
+                finalUrl = urlInput.value.trim();
+            }
+
+            bannerData[`banner${i}`] = finalUrl;
+        }
+
+        await db.collection("config").doc("homepage").set(bannerData, { merge: true });
+        
+        alert("Cập nhật Banner thành công! Số lượng và ảnh đã tự động tối ưu.");
+        document.getElementById('bannerModal').style.display = 'none';
+        
+        for (let i = 1; i <= 10; i++) {
+            if(document.getElementById(`admin-banner-file-${i}`)) {
+                document.getElementById(`admin-banner-file-${i}`).value = "";
+            }
+        }
+
+    } catch (err) {
+        alert("Lỗi: " + err.message);
+    } finally {
+        if (btnSave) {
+            btnSave.innerText = "LƯU BANNER";
+            btnSave.disabled = false;
+        }
+    }
+};
+
+// ==========================================
+// HỆ THỐNG BÁO CÁO THỐNG KÊ (CÓ CHI TIẾT)
+// ==========================================
+window.statsData = { completedOrders: [], allOrders: [], pendingOrders: [], allBooks: [], totalRevenue: 0 };
+
+window.openStatsManager = async function() {
+    document.getElementById('statsModal').style.display = 'block';
+    document.getElementById('stats-loading').style.display = 'block';
+    document.getElementById('stats-dashboard').style.display = 'none';
+    document.getElementById('stats-detail-view').style.display = 'none';
+
+    try {
+        window.statsData = { completedOrders: [], allOrders: [], pendingOrders: [], allBooks: [], totalRevenue: 0 };
+
+        const ordersSnapshot = await db.collection("orders").orderBy("createdAt", "desc").get();
+        ordersSnapshot.forEach(doc => {
+            const order = doc.data();
+            order.id = doc.id;
+            
+            if (order.createdAt) {
+                order.dateStr = order.createdAt.toDate().toLocaleDateString('vi-VN');
+            } else {
+                order.dateStr = "N/A";
+            }
+
+            window.statsData.allOrders.push(order);
+            
+            if (order.status === "Đã giao") {
+                window.statsData.completedOrders.push(order);
+                window.statsData.totalRevenue += (Number(order.totalAmount) || 0);
+            } else {
+                window.statsData.pendingOrders.push(order);
+            }
+        });
+
+        const booksSnapshot = await db.collection("books").orderBy("title").get();
+        booksSnapshot.forEach(doc => {
+            const book = doc.data();
+            book.id = doc.id;
+            window.statsData.allBooks.push(book);
+        });
+
+        const formatMoney = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(window.statsData.totalRevenue);
+        document.getElementById('stat-revenue').innerText = formatMoney;
+        document.getElementById('stat-orders').innerText = window.statsData.allOrders.length + " đơn";
+        document.getElementById('stat-pending').innerText = window.statsData.pendingOrders.length + " đơn";
+        document.getElementById('stat-books').innerText = window.statsData.allBooks.length + " cuốn";
+
+        document.getElementById('stats-loading').style.display = 'none';
+        document.getElementById('stats-dashboard').style.display = 'grid';
+
+    } catch (error) {
+        document.getElementById('stats-loading').innerText = "❌ Lỗi tải dữ liệu: " + error.message;
+    }
+};
+
+window.showStatsDetail = function(type) {
+    document.getElementById('stats-dashboard').style.display = 'none';
+    document.getElementById('stats-detail-view').style.display = 'block';
+    
+    const titleEl = document.getElementById('detail-title');
+    const contentEl = document.getElementById('detail-content');
+    const formatMoney = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+    
+    let html = '';
+
+    if (type === 'revenue') {
+        titleEl.innerText = "💰 Chi tiết Doanh Thu (Các đơn đã giao thành công)";
+        if (window.statsData.completedOrders.length === 0) {
+            contentEl.innerHTML = "<p style='padding: 20px; text-align: center; color: #666;'>Chưa có doanh thu.</p>"; return;
+        }
+        html += `<table style="width:100%; border-collapse: collapse; font-size:14px; text-align: left;">
+                    <tr style="background:#f8f9fa;"><th style="padding:12px; border-bottom:1px solid #ddd;">Ngày</th><th style="padding:12px; border-bottom:1px solid #ddd;">Khách hàng</th><th style="padding:12px; border-bottom:1px solid #ddd; text-align:right;">Thành tiền</th></tr>`;
+        window.statsData.completedOrders.forEach(o => {
+            html += `<tr>
+                        <td style="padding:12px; border-bottom:1px solid #eee;">${o.dateStr}</td>
+                        <td style="padding:12px; border-bottom:1px solid #eee;"><strong>${o.customerName}</strong></td>
+                        <td style="padding:12px; border-bottom:1px solid #eee; text-align:right; color:#28a745; font-weight:bold;">${formatMoney.format(o.totalAmount)}</td>
+                     </tr>`;
+        });
+        html += `</table>`;
+
+    } else if (type === 'orders') {
+        titleEl.innerText = "📦 Danh sách Tất cả Đơn Hàng";
+        if (window.statsData.allOrders.length === 0) {
+            contentEl.innerHTML = "<p style='padding: 20px; text-align: center;'>Chưa có đơn hàng nào.</p>"; return;
+        }
+        html += `<ul style="list-style:none; padding:0; margin: 0;">`;
+        window.statsData.allOrders.forEach(o => {
+            let color = o.status === "Đã giao" ? "#28a745" : "#f26522";
+            html += `<li style="padding:15px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items: center;">
+                        <div>
+                            <strong style="font-size:15px; color:#333;">${o.customerName}</strong>
+                            <div style="font-size:12px; color:#777; margin-top:3px;">Ngày: ${o.dateStr} | SĐT: ${o.customerPhone}</div>
+                        </div>
+                        <span style="color:${color}; font-weight:bold; font-size:12px; border:1px solid ${color}; padding:4px 8px; border-radius:12px;">${o.status}</span>
+                     </li>`;
+        });
+        html += `</ul>`;
+
+    } else if (type === 'pending') {
+        titleEl.innerText = "⏳ Danh sách Đơn Chờ Xử Lý";
+        if (window.statsData.pendingOrders.length === 0) {
+            contentEl.innerHTML = "<p style='padding: 20px; text-align: center; color: green; font-weight:bold;'>Tuyệt vời! Không có đơn hàng nào đang tồn đọng.</p>"; return;
+        }
+        html += `<ul style="list-style:none; padding:0; margin: 0;">`;
+        window.statsData.pendingOrders.forEach(o => {
+            html += `<li style="padding:15px; border-bottom:1px solid #eee; background:#fffdf5;">
+                        <strong style="font-size:15px; color:#d9534f;">${o.customerName}</strong> - <span style="color:#555;">${o.customerPhone}</span>
+                        <div style="font-size:13px; color:#666; margin-top:5px;">📍 Địa chỉ: ${o.customerAddress}</div>
+                     </li>`;
+        });
+        html += `</ul>`;
+
+    } else if (type === 'books') {
+        titleEl.innerText = `📚 Chi tiết Sách trong kho (${window.statsData.allBooks.length} cuốn)`;
+        if (window.statsData.allBooks.length === 0) {
+            contentEl.innerHTML = "<p style='padding: 20px; text-align: center;'>Kho sách đang trống.</p>"; return;
+        }
+        html += `<div style="max-height: 500px; overflow-y: auto;">
+                 <table style="width:100%; border-collapse: collapse; font-size:14px; text-align: left;">
+                    <tr style="background:#f8f9fa; position: sticky; top: 0; z-index: 10;">
+                        <th style="padding:12px; border-bottom:1px solid #ddd; width: 60px;">Ảnh</th>
+                        <th style="padding:12px; border-bottom:1px solid #ddd;">Tên sách</th>
+                        <th style="padding:12px; border-bottom:1px solid #ddd;">Danh mục</th>
+                        <th style="padding:12px; border-bottom:1px solid #ddd; text-align:right;">Giá bán</th>
+                    </tr>`;
+        window.statsData.allBooks.forEach(b => {
+            // Kiểm tra nếu không có ảnh thì dùng ảnh tạm (placeholder)
+            const bookImg = b.image ? b.image : 'https://via.placeholder.com/50';
+            html += `<tr>
+                        <td style="padding:10px; border-bottom:1px solid #eee;">
+                            <img src="${bookImg}" style="width: 45px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd;">
+                        </td>
+                        <td style="padding:10px; border-bottom:1px solid #eee; color:#333; font-weight:bold;">${b.title}</td>
+                        <td style="padding:10px; border-bottom:1px solid #eee; color:#666; font-size:13px;">${b.category}</td>
+                        <td style="padding:10px; border-bottom:1px solid #eee; text-align:right; color:#d0021b; font-weight:bold;">${formatMoney.format(b.price)}</td>
+                     </tr>`;
+        });
+        html += `</table></div>`;
+    }
+
+    contentEl.innerHTML = html;
+};
+
+window.backToStatsDashboard = function() {
+    document.getElementById('stats-detail-view').style.display = 'none';
+    document.getElementById('stats-dashboard').style.display = 'grid';
+};
+// ==========================================
+// HỆ THỐNG QUẢN LÝ VÀ HIỂN THỊ FLASH SALE
+// ==========================================
+
+// 1. Mở bảng điều khiển Flash Sale
+window.openFlashSaleManager = function() {
+    document.getElementById('flashSaleModal').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    
+    const selectBox = document.getElementById('fs-book-select');
+    selectBox.innerHTML = '<option value="">-- Chọn sách từ kho --</option>';
+    window.allBooks.forEach(b => {
+        selectBox.innerHTML += `<option value="${b.id}">${b.title} (${new Intl.NumberFormat('vi-VN').format(b.price)}đ)</option>`;
+    });
+    renderAdminFlashSaleList();
+};
+
+// 2. Hiển thị danh sách trong bảng Admin
+window.renderAdminFlashSaleList = function() {
+    const activeList = document.getElementById('fs-active-list');
+    const fsBooks = window.allBooks.filter(b => b.flashSaleDiscount > 0);
+    
+    if(fsBooks.length === 0) {
+        activeList.innerHTML = '<p style="text-align: center; color: #999; margin-top: 20px;">Chưa có sản phẩm nào đang chạy Flash Sale.</p>';
+        return;
+    }
+
+    let html = '';
+    fsBooks.forEach(b => {
+        html += `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; background: #fff;">
+            <div>
+                <strong style="color: #105b4d; font-size: 14px;">${b.title}</strong> 
+                <span style="background: #e74c3c; color: white; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 8px; font-weight: bold;">-${b.flashSaleDiscount}%</span>
+            </div>
+            <button onclick="removeFromFlashSale('${b.id}')" style="background: #ccc; color: #333; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Gỡ bỏ</button>
+        </div>`;
+    });
+    activeList.innerHTML = html;
+};
+
+// 3. Thêm sách vào Flash Sale lên Firebase
+window.addToFlashSale = async function() {
+    const bookId = document.getElementById('fs-book-select').value;
+    const discount = Number(document.getElementById('fs-discount').value);
+    
+    if(!bookId) return alert("Vui lòng chọn 1 cuốn sách!");
+    if(!discount || discount <= 0 || discount >= 100) return alert("Vui lòng nhập % giảm giá hợp lệ (từ 1 đến 99)!");
+
+    await db.collection("books").doc(bookId).update({ flashSaleDiscount: discount });
+    alert("Tuyệt vời! Đã đưa sách vào Flash Sale.");
+    renderAdminFlashSaleList();
+};
+
+// 4. Gỡ sách khỏi Flash Sale
+window.removeFromFlashSale = async function(id) {
+    if(confirm("Bạn có chắc chắn muốn gỡ sách này khỏi chương trình Flash Sale?")) {
+        // Xóa trường flashSaleDiscount trên Firebase
+        await db.collection("books").doc(id).update({ flashSaleDiscount: firebase.firestore.FieldValue.delete() });
+        renderAdminFlashSaleList();
+    }
+};
+
+// 5. Hiển thị Flash Sale ra ngoài Trang chủ (Cho khách hàng xem)
+window.renderFlashSaleFrontend = function() {
+    const fsSection = document.getElementById('flash-sale-section');
+    const fsGrid = document.getElementById('flash-sale-grid');
+    if(!fsSection || !fsGrid) return; // Nếu đang ở trang khác không có ô này thì bỏ qua
+
+    const fsBooks = window.allBooks.filter(b => b.flashSaleDiscount > 0);
+    
+    if(fsBooks.length === 0) {
+        fsSection.style.display = 'none'; // Giấu đi nếu Admin chưa chọn sách nào
+        return;
+    }
+    
+    fsSection.style.display = 'block';
+    let html = '';
+    
+    // Chỉ lấy 5 cuốn hiện ra ngoài màn hình cho gọn đẹp
+    fsBooks.slice(0, 5).forEach(book => {
+        const currentPrice = book.price * (1 - book.flashSaleDiscount / 100); // Công thức tính giá sau giảm
+        const formatOldPrice = new Intl.NumberFormat('vi-VN').format(book.price) + 'đ';
+        const formatNewPrice = new Intl.NumberFormat('vi-VN').format(currentPrice) + 'đ';
+        const imageUrl = book.image ? book.image : 'https://via.placeholder.com/250x300?text=Chưa+có+ảnh';
+
+        html += `
+            <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'" style="background: #fff; border-radius: 8px; padding: 12px; position: relative; cursor: pointer; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                
+                <div style="position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-weight: bold; font-size: 13px; padding: 4px 8px; border-radius: 4px; z-index: 2;">-${book.flashSaleDiscount}%</div>
+                
+                <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 160px; object-fit: contain; margin-bottom: 12px;">
+                <h3 style="font-size: 13px; height: 36px; overflow: hidden; margin-bottom: 8px; color: #333; line-height: 1.4;">${book.title}</h3>
+                
+                <div style="display: flex; flex-direction: column;">
+                    <span style="color: #e74c3c; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
+                    <span style="color: #999; text-decoration: line-through; font-size: 12px;">${formatOldPrice}</span>
+                </div>
+            </div>
+        `;
+    });
+    fsGrid.innerHTML = html;
+};
+
+// MẸO NHỎ MÀ CÓ VÕ LÀ ĐÂY:
+// Khi Firebase báo có dữ liệu sách mới tải về (ở dòng 102), chúng ta yêu cầu nó chạy luôn hàm renderFlashSaleFrontend!
+const originalRenderBooks = window.renderBooks;
+window.renderBooks = function() {
+    originalRenderBooks(); 
+    renderFlashSaleFrontend(); // Tự động load Flash sale liên tục
 };

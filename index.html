@@ -7,51 +7,49 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="top-auth-bar" style="background: #f1f1f1; border-bottom: 1px solid #e5e5e5; padding: 6px 0;">
+    <div id="top-auth-bar" style="background: #0b4036; border-bottom: 1px solid #09332b; padding: 6px 0;">
         <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; padding: 0 20px; gap: 20px; font-size: 13px;">
-            <span id="user-greeting" style="display: none; color: #f26522; font-weight: bold;"></span>
-            <a href="#" id="btn-show-login" onclick="document.getElementById('authModal').style.display='block'; showLoginForm(); return false;" style="color: #555; text-decoration: none;">👤 Đăng nhập</a>
-            <a href="#" id="btn-show-register" onclick="document.getElementById('authModal').style.display='block'; showRegisterForm(); return false;" style="color: #555; text-decoration: none;">Đăng ký</a>
-            <a href="#" id="btn-logout" onclick="logoutUser()" style="display: none; color: #555; text-decoration: none;">Đăng xuất</a>
+            <span id="user-greeting" style="display: none; color: #fff; font-weight: bold;"></span>
+            <a href="#" id="btn-show-login" onclick="document.getElementById('authModal').style.display='block'; showLoginForm(); return false;" style="color: #ddd; text-decoration: none;">👤 Đăng nhập / Đăng ký</a>
+            <a href="#" id="btn-logout" onclick="logoutUser()" style="display: none; color: #ddd; text-decoration: none;">Đăng xuất</a>
         </div>
     </div>
-    <header class="header" style="background: #fff; border-bottom: 1px solid #eaeaea; padding: 15px 0;">
+
+    <header class="header" style="background: #105b4d; padding: 15px 0;">
         <div class="header-container" style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
             <div class="logo">
-                <h1 style="margin: 0; color: #d9534f;"><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
+                <h1 style="margin: 0; color: #fff;"><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
             </div>
             
             <div class="search-bar" style="flex: 1; margin: 0 50px;">
-                <div style="display: flex; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; max-width: 500px; margin: auto;">
-                    <input type="text" placeholder="Bạn cần tìm gì?" style="width: 100%; padding: 10px 15px; border: none; outline: none;">
-                    <button style="padding: 10px 20px; background-color: #fff; border: none; cursor: pointer; border-left: 1px solid #ccc; color: #f26522; font-weight: bold;">🔍</button>
+                <div style="display: flex; border: 2px solid #fff; border-radius: 4px; overflow: hidden; max-width: 600px; margin: auto; background: #fff;">
+                    <input type="text" placeholder="Tìm kiếm sản phẩm..." style="width: 100%; padding: 10px 15px; border: none; outline: none; font-size: 14px;">
+                    <button style="padding: 10px 25px; background-color: #0b4036; border: none; cursor: pointer; color: #fff; font-weight: bold; font-size: 16px;">🔍</button>
                 </div>
             </div>
 
             <div class="user-actions" style="display: flex; align-items: center; gap: 30px;">
-                
-                <button id="btnAdminAccess" class="btn-admin-add" style="background-color: #333; color: #fff; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="document.getElementById('adminHubModal').style.display='block'">⚙️ Admin Truy Cập</button>
+                <button id="btnAdminAccess" class="btn-admin-add" style="background-color: #fff; color: #105b4d; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; display: none; box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="document.getElementById('adminHubModal').style.display='block'">⚙️ Admin</button>
 
-                <div style="display: flex; align-items: center; gap: 10px; color: #f26522;">
+                <div style="display: flex; align-items: center; gap: 10px; color: #fff;">
                     <span style="font-size: 28px;">🎧</span>
                     <div>
                         <div style="font-weight: bold; font-size: 16px;">0866 643 XXX</div>
-                        <div style="font-size: 12px; color: #666;">Hot line</div>
+                        <div style="font-size: 12px; color: #ddd;">Hot line</div>
                     </div>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <span style="font-size: 24px; color: #f26522;">🛒</span>
-                    <a href="cart.html" id="cart-count-text" style="color: #f26522; font-weight: bold; text-decoration: none; font-size: 14px;">0 sản phẩm</a>
+                <div style="display: flex; align-items: center; gap: 5px; color: #fff;">
+                    <span style="font-size: 24px;">🛒</span>
+                    <a href="cart.html" id="cart-count-text" style="color: #fff; font-weight: bold; text-decoration: none; font-size: 14px;">0 sản phẩm</a>
                 </div>
-                
             </div>
         </div>
     </header>
-<nav class="main-nav">
-        <ul>
-            <li class="dropdown">
-                <a href="#" class="dropbtn">☰ DANH MỤC SẢN PHẨM</a>
+<nav class="main-nav" style="background-color: #fff; border-bottom: 1px solid #eaeaea; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <ul style="display: flex; list-style: none; margin: 0 auto; max-width: 1200px; padding: 0 20px; align-items: center;">
+            <li class="dropdown" style="margin-right: 20px;">
+                <a href="#" class="dropbtn" style="background: #fff; color: #105b4d; padding: 15px 20px; display: inline-block; font-weight: bold; text-decoration: none; border-right: 1px solid #eaeaea; border-left: 1px solid #eaeaea;">☰ DANH MỤC SẢN PHẨM</a>
                 
                 <div class="dropdown-content">
                     
@@ -78,6 +76,10 @@
                             <div class="sub-column">
                                 <h3>Danh mục</h3>
                                 <a href="#" onclick="filterCategory(event, 'Tiểu thuyết, thơ, hồi ký phóng sự...')">Tiểu thuyết, thơ, hồi ký phóng sự...</a>
+                                <a href="#" onclick="filterCategory(event, 'Đam mỹ')">Đam mỹ</a>
+                                <a href="#" onclick="filterCategory(event, 'Ngôn tình')">Ngôn tình</a>
+                                <a href="#" onclick="filterCategory(event, 'Kinh dị')">Kinh dị</a>
+                                <a href="#" onclick="filterCategory(event, 'Trinh thám')">Trinh thám</a>
                                 <a href="#" onclick="filterCategory(event, 'Sách Kinh tế - Khởi nghiệp')">Sách Kinh tế - Khởi nghiệp</a>
                                 <a href="#" onclick="filterCategory(event, 'Sách Kỹ năng sống')">Sách Kỹ năng sống</a>
                                 <a href="#" onclick="filterCategory(event, 'Sách Ngoại ngữ')">Sách Ngoại ngữ</a>
@@ -110,8 +112,21 @@
                 </div>
             </li>
 
-            <li><a href="#" onclick="filterCategory(event, 'all')">TẤT CẢ</a></li>
-            <li><a href="#" onclick="filterCategory(event, 'Sách')">SÁCH HAY</a></li>
+            <li style="padding-left: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #333; font-weight: normal;">
+                    <span style="font-size: 18px;">🎖️</span> Hàng chính hãng
+                </div>
+            </li>
+            <li style="padding-left: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #333; font-weight: normal;">
+                    <span style="font-size: 18px;">🔄</span> Miễn phí hoàn hàng
+                </div>
+            </li>
+            <li style="padding-left: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; color: #333; font-weight: normal;">
+                    <span style="font-size: 18px;">🚚</span> Hỗ trợ vận chuyển
+                </div>
+            </li>
         </ul>
     </nav>
     <div id="addBookModal" class="modal">
@@ -132,36 +147,23 @@
                         <div class="input-group">
                     <label>Danh mục sản phẩm</label>
                     <select id="bookCategory" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-                        <option value="Sách">Sách - Truyện Tranh</option>
-                        <option value="Sách Mới">Sách Mới Cập Nhật</option>
-
-                        <optgroup label="Sách Tiếng Việt nổi bật">
-                            <option value="Sách đồng giá">Sách đồng giá</option>
-                            <option value="Sách hot, best-seller">Sách hot, best-seller</option>
-                            <option value="Sách hay nên đọc">Sách hay nên đọc</option>
-                            <option value="Sách mới">Sách mới</option>
-                            <option value="Sách sắp phát hành">Sách sắp phát hành</option>
-                        </optgroup>
-
-                        <optgroup label="Sách theo chủ đề">
-                            <option value="Tuổi học trò & Thời thanh xuân">Tuổi học trò & Thời thanh xuân</option>
-                            <option value="Sách cho phái đẹp">Sách cho phái đẹp</option>
-                            <option value="Đam mê xê dịch">Đam mê xê dịch</option>
-                            <option value="Tiểu thuyết lãng mạn">Tiểu thuyết lãng mạn</option>
-                        </optgroup>
-
-                        <optgroup label="Danh mục">
-                            <option value="Tiểu thuyết, thơ, hồi ký phóng sự...">Tiểu thuyết, thơ, hồi ký phóng sự...</option>
-                            <option value="Sách Kinh tế - Khởi nghiệp">Sách Kinh tế - Khởi nghiệp</option>
-                            <option value="Sách Kỹ năng sống">Sách Kỹ năng sống</option>
-                            <option value="Sách Ngoại ngữ">Sách Ngoại ngữ</option>
-                            <option value="Sách Nuôi dạy con">Sách Nuôi dạy con</option>
-                            <option value="Sách Thiếu nhi">Sách Thiếu nhi</option>
-                            <option value="Sách cho Teen">Sách cho Teen</option>
-                            <option value="Chính trị - Triết học Đông Tây">Chính trị - Triết học Đông Tây</option>
-                            <option value="Bách khoa tri thức">Bách khoa tri thức</option>
-                            <option value="Kiến thức chuyên ngành, Khảo cứu">Kiến thức chuyên ngành, Khảo cứu</option>
-                        </optgroup>
+                        <option value="Tiểu thuyết, thơ, hồi ký phóng sự...">Tiểu thuyết, thơ, hồi ký phóng sự...</option>
+                        <option value="Sách Kinh tế - Khởi nghiệp">Sách Kinh tế - Khởi nghiệp</option>
+                        <option value="Sách Kỹ năng sống">Sách Kỹ năng sống</option>
+                        <option value="Sách Ngoại ngữ">Sách Ngoại ngữ</option>
+                        <option value="Sách Nuôi dạy con">Sách Nuôi dạy con</option>
+                        <option value="Sách Thiếu nhi">Sách Thiếu nhi</option>
+                        <option value="Sách cho Teen">Sách cho Teen</option>
+                        <option value="Chính trị - Triết học Đông Tây">Chính trị - Triết học Đông Tây</option>
+                        <option value="Bách khoa tri thức">Bách khoa tri thức</option>
+                        <option value="Kiến thức chuyên ngành, Khảo cứu">Kiến thức chuyên ngành, Khảo cứu</option>
+                        <option value="Coloring Book">Coloring Book</option>
+                        <option value="Learning Foreign Language">Learning Foreign Language</option>
+                        <option value="Truyện tranh manga, comic">Truyện tranh manga, comic</option>
+                        <option value="Đam mỹ">Đam mỹ</option>
+                        <option value="Ngôn tình">Ngôn tình</option>
+                        <option value="Kinh dị">Kinh dị</option>
+                        <option value="Trinh thám">Trinh thám</option>
                     </select>
                 </div>
                         <label>Giá bán (VNĐ)</label>
@@ -193,8 +195,14 @@
                 </div>
 
                 <div class="input-group" style="margin-top: 15px;">
-                    <label>Link ảnh bìa sách (URL)</label>
-                    <input type="text" id="bookImage" required>
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Ảnh bìa sách</label>
+                    <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                        <p style="margin: 0 0 5px 0; font-size: 13px; color: #555; font-weight: bold;">Cách 1: Chọn ảnh từ máy tính</p>
+                        <input type="file" id="bookImageFile" accept="image/*" style="width: 100%; margin-bottom: 10px;">
+                        
+                        <p style="margin: 0 0 5px 0; font-size: 13px; color: #555; font-weight: bold;">Cách 2: Hoặc dán link URL ảnh</p>
+                        <input type="text" id="bookImage" placeholder="Dán link URL vào đây..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>Giới thiệu sản phẩm</label>
@@ -207,55 +215,150 @@
     </div>
 
     <main class="main-content">
-        <div style="max-width: 1200px; margin: 20px auto 20px; position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);" id="home-banner">
+        <div style="max-width: 1200px; margin: 20px auto 20px; display: flex; gap: 20px; align-items: flex-start;">
             
-            <div class="my-slide" style="display: block; animation: fadeBanner 1.5s;">
-                <img src="https://theme.hstatic.net/200000343865/1001052087/14/slide_1_img.jpg?v=480" alt="Banner 1" style="width: 100%; display: block; object-fit: cover; height: 350px;">
-            </div>
-            <div class="my-slide" style="display: none; animation: fadeBanner 1.5s;">
-                <img src="https://theme.hstatic.net/200000343865/1001052087/14/slide_2_img.jpg?v=480" alt="Banner 2" style="width: 100%; display: block; object-fit: cover; height: 350px;">
-            </div>
-            <div class="my-slide" style="display: none; animation: fadeBanner 1.5s;">
-                <img src="https://theme.hstatic.net/200000343865/1001052087/14/slide_3_img.jpg?v=480" alt="Banner 3" style="width: 100%; display: block; object-fit: cover; height: 350px;">
+            <div style="width: 250px; background: #fff; border-radius: 8px; border: 1px solid #eaeaea; box-shadow: 0 2px 8px rgba(0,0,0,0.05); flex-shrink: 0; overflow: hidden;">
+                <div style="background: #105b4d; color: white; font-weight: bold; padding: 15px; font-size: 15px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 18px;">☰</span> DANH MỤC
+                </div>
+                <ul style="list-style: none; margin: 0; padding: 0;">
+                    <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'all')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">📚 Tất cả sản phẩm</a></li>
+                    <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Tiểu thuyết, thơ, hồi ký phóng sự...')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">📖 Tiểu thuyết, thơ, hồi ký...</a></li>
+                    <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Sách Kinh tế - Khởi nghiệp')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">📈 Kinh tế - Khởi nghiệp</a></li>
+                    <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Sách Kỹ năng sống')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">💡 Kỹ năng sống</a></li>
+                    <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Sách Ngoại ngữ')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🌍 Ngoại ngữ</a></li>
+                    <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Sách Nuôi dạy con')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">👨‍👩‍👧 Nuôi dạy con</a></li>
+                    
+                    <div id="extraCategories" style="display: none;">
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Sách Thiếu nhi')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🧸 Thiếu nhi</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Sách cho Teen')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🎧 Sách cho Teen</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Chính trị - Triết học Đông Tây')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">⚖️ Triết học Đông Tây</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Bách khoa tri thức')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🔬 Bách khoa tri thức</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Kiến thức chuyên ngành, Khảo cứu')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🎓 Kiến thức chuyên ngành</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Coloring Book')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🖍️ Coloring Book</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Learning Foreign Language')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🗣️ Learning Foreign Language</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Truyện tranh manga, comic')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🦸‍♂️ Manga, comic</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Đam mỹ')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">👬 Đam mỹ</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Ngôn tình')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">💕 Ngôn tình</a></li>
+                        <li style="border-bottom: 1px solid #f1f1f1;"><a href="#" onclick="filterCategory(event, 'Kinh dị')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">👻 Kinh dị</a></li>
+                        <li><a href="#" onclick="filterCategory(event, 'Trinh thám')" style="display: block; padding: 12px 20px; color: #333; text-decoration: none; font-size: 14px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'; this.style.backgroundColor='#f9f9f9'" onmouseout="this.style.color='#333'; this.style.backgroundColor='transparent'">🕵️‍♂️ Trinh thám</a></li>
+                    </div>
+                    
+                    <li style="text-align: center; background: #fcfcfc; border-top: 1px solid #eaeaea;">
+                        <a href="#" onclick="toggleCategories(event)" id="toggleCatText" style="display: block; padding: 12px 20px; color: #105b4d; text-decoration: none; font-size: 14px; font-weight: bold; transition: 0.2s;" onmouseover="this.style.background='#f1f1f1'" onmouseout="this.style.background='transparent'">Xem thêm danh mục ▾</a>
+                    </li>
+                </ul>
+
+                <script>
+                    function toggleCategories(e) {
+                        e.preventDefault();
+                        var extraCats = document.getElementById('extraCategories');
+                        var btnText = document.getElementById('toggleCatText');
+                        if (extraCats.style.display === 'none') {
+                            extraCats.style.display = 'block';
+                            btnText.innerHTML = 'Thu gọn danh mục ▴';
+                        } else {
+                            extraCats.style.display = 'none';
+                            btnText.innerHTML = 'Xem thêm danh mục ▾';
+                        }
+                    }
+                </script>
             </div>
 
-            <a onclick="manualMoveSlide(-1)" style="cursor: pointer; position: absolute; top: 50%; left: 15px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.3); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 20px; font-weight: bold; user-select: none; transition: 0.3s; text-decoration: none;">&#10094;</a>
-            <a onclick="manualMoveSlide(1)" style="cursor: pointer; position: absolute; top: 50%; right: 15px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.3); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 20px; font-weight: bold; user-select: none; transition: 0.3s; text-decoration: none;">&#10095;</a>
-            
-            <style>
-                @keyframes fadeBanner { from {opacity: .5} to {opacity: 1} }
-                /* CSS cho khối danh mục ở giữa */
-                .cat-box { text-decoration: none; color: #333; padding: 20px 10px; border: 1px solid #eee; border-radius: 8px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; height: 100%; }
-                .cat-box:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-5px); border-color: #f26522; color: #f26522; }
-                .cat-icon { font-size: 38px; margin-bottom: 12px; }
-                .cat-name { font-size: 14px; font-weight: bold; text-align: center; line-height: 1.4; }
-            </style>
-            
-            <script>
-                let currentSlideIndex = 0;
-                let bannerTimer;
-                function runBanner() {
-                    let slides = document.querySelectorAll(".my-slide");
-                    if(slides.length === 0) return;
-                    for (let i = 0; i < slides.length; i++) { slides[i].style.display = "none"; }
-                    currentSlideIndex++;
-                    if (currentSlideIndex > slides.length) {currentSlideIndex = 1}    
-                    slides[currentSlideIndex-1].style.display = "block";  
-                    bannerTimer = setTimeout(runBanner, 4000); 
-                }
-                function manualMoveSlide(n) {
-                    clearTimeout(bannerTimer); 
-                    let slides = document.querySelectorAll(".my-slide");
-                    currentSlideIndex += n - 1; 
-                    if (currentSlideIndex < 0) { currentSlideIndex = slides.length - 1; }
-                    runBanner(); 
-                }
-                setTimeout(runBanner, 100); 
-            </script>
+            <div style="flex: 1; position: relative; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); background-color: #fdf5d3;" id="home-banner">
+                
+                <div class="my-slide" style="display: block; animation: fadeBanner 1.5s; height: 100%;">
+                    <img src="https://theme.hstatic.net/200000343865/1001052087/14/slide_1_img.jpg?v=480" alt="Banner 1" style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                </div>
+                <div class="my-slide" style="display: none; animation: fadeBanner 1.5s; height: 100%;">
+                    <img src="https://theme.hstatic.net/200000343865/1001052087/14/slide_2_img.jpg?v=480" alt="Banner 2" style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                </div>
+                <div class="my-slide" style="display: none; animation: fadeBanner 1.5s; height: 100%;">
+                    <img src="https://theme.hstatic.net/200000343865/1001052087/14/slide_3_img.jpg?v=480" alt="Banner 3" style="width: 100%; height: 100%; display: block; object-fit: cover;">
+                </div>
+
+                <a onclick="manualMoveSlide(-1)" style="cursor: pointer; position: absolute; top: 50%; left: 15px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.3); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 20px; font-weight: bold; user-select: none; transition: 0.3s; text-decoration: none; z-index: 10;">&#10094;</a>
+                <a onclick="manualMoveSlide(1)" style="cursor: pointer; position: absolute; top: 50%; right: 15px; transform: translateY(-50%); width: 40px; height: 40px; background: rgba(0,0,0,0.3); color: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 20px; font-weight: bold; user-select: none; transition: 0.3s; text-decoration: none; z-index: 10;">&#10095;</a>
+                
+                <div id="banner-dots" style="position: absolute; bottom: 15px; width: 100%; text-align: center; z-index: 10;"></div>
+
+                <style>
+                    @keyframes fadeBanner { from {opacity: .6} to {opacity: 1} }
+                    /* CSS cho dấu chấm tĩnh */
+                    .dot { cursor: pointer; height: 8px; width: 8px; margin: 0 4px; background-color: rgba(255,255,255,0.7); border-radius: 50%; display: inline-block; transition: all 0.3s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+                    /* CSS cho dấu chấm khi đang xem hoặc rê chuột (kéo dài thành viên thuốc màu xanh) */
+                    .dot.active, .dot:hover { background-color: #105b4d; width: 24px; border-radius: 4px; }
+                </style>
+                
+                <script>
+                    let currentSlideIndex = 0;
+                    let bannerTimer;
+                    let lastSlideCount = 0;
+
+                    function showSlide() {
+                        let slides = document.querySelectorAll(".my-slide");
+                        let dotsContainer = document.getElementById("banner-dots");
+                        
+                        if (slides.length === 0) return;
+
+                        // Tự động vẽ dấu chấm dựa trên số lượng ảnh hiện có
+                        if (slides.length !== lastSlideCount) {
+                            lastSlideCount = slides.length;
+                            dotsContainer.innerHTML = "";
+                            for (let i = 0; i < slides.length; i++) {
+                                dotsContainer.innerHTML += `<span class="dot" onclick="jumpToSlide(${i})"></span>`;
+                            }
+                        }
+
+                        let dots = document.querySelectorAll(".dot");
+
+                        // Xử lý vòng lặp slide
+                        if (currentSlideIndex >= slides.length) { currentSlideIndex = 0; }
+                        if (currentSlideIndex < 0) { currentSlideIndex = slides.length - 1; }
+
+                        // Ẩn tất cả slide và tắt màu các chấm
+                        for (let i = 0; i < slides.length; i++) { slides[i].style.display = "none"; }
+                        for (let i = 0; i < dots.length; i++) { dots[i].classList.remove("active"); }
+
+                        // Hiển thị slide hiện tại và bật màu chấm tương ứng
+                        slides[currentSlideIndex].style.display = "block";
+                        if(dots[currentSlideIndex]) dots[currentSlideIndex].classList.add("active");
+
+                        // Reset thời gian tự động chạy (4 giây)
+                        clearTimeout(bannerTimer);
+                        bannerTimer = setTimeout(() => { currentSlideIndex++; showSlide(); }, 4000);
+                    }
+
+                    // Hàm khi bấm mũi tên
+                    function manualMoveSlide(n) {
+                        currentSlideIndex += n;
+                        showSlide();
+                    }
+
+                    // Hàm khi bấm vào dấu chấm
+                    function jumpToSlide(n) {
+                        currentSlideIndex = n;
+                        showSlide();
+                    }
+
+                    // "Con mắt" theo dõi: Nếu hệ thống Admin đổi ảnh mới qua Firebase -> Tự động load lại chấm
+                    const bannerObserver = new MutationObserver(() => {
+                        let slides = document.querySelectorAll(".my-slide");
+                        if(slides.length !== lastSlideCount && slides.length > 0) {
+                            currentSlideIndex = 0;
+                            showSlide();
+                        }
+                    });
+                    bannerObserver.observe(document.getElementById('home-banner'), { childList: true });
+
+                    // Bắt đầu chạy
+                    setTimeout(showSlide, 100);
+                </script>
+            </div>
         </div>
 
         <div style="max-width: 1200px; margin: 0 auto 40px; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
-            <h2 style="font-size: 18px; text-transform: uppercase; border-bottom: 2px solid #f26522; padding-bottom: 10px; margin-bottom: 20px; display: inline-block; color: #333;">Danh mục nổi bật</h2>
+            <h2 style="font-size: 18px; text-transform: uppercase; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 20px; display: inline-block; color: #333;">Danh mục nổi bật</h2>
             
             <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px;">
                 <a href="#" onclick="filterCategory(event, 'Tiểu thuyết, thơ, hồi ký phóng sự...')" class="cat-box">
@@ -301,6 +404,19 @@
             </div>
         </div>
 
+        <div id="flash-sale-section" style="display: none; background: #105b4d; border-radius: 8px; padding: 20px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 28px;">⚡</span>
+                    <h2 style="margin: 0; color: #fff; font-size: 24px; font-style: italic;">FLASH SALE</h2>
+                </div>
+                <a href="#" style="color: #333; text-decoration: none; font-size: 13px; font-weight: bold; background: #fff; padding: 6px 15px; border-radius: 20px;">Xem tất cả ›</a>
+            </div>
+            
+            <div id="flash-sale-grid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px;">
+                </div>
+        </div>
+
         <section class="product-section">
             <div class="section-title">
                 <h2>SÁCH HAY</h2>
@@ -320,15 +436,15 @@
             <div style="display: flex; align-items: center; gap: 20px;">
                 <div style="font-size: 50px;">💌</div>
                 <div>
-                    <h3 style="color: #f26522; margin: 0 0 5px 0; font-size: 20px;">Đăng ký nhận bản tin</h3>
+                    <h3 style="color: #105b4d; margin: 0 0 5px 0; font-size: 20px;">Đăng ký nhận bản tin</h3>
                     <p style="margin: 0; font-size: 14px; color: #666;">Đừng bỏ lỡ những tin nhắn ưu đãi độc quyền dành riêng cho bạn</p>
                 </div>
             </div>
             <div style="display: flex; flex: 1; max-width: 600px; border: 1px solid #ccc; border-radius: 4px; overflow: hidden;">
                 <input type="text" placeholder="Nhập tên của bạn" style="padding: 10px 15px; border: none; border-right: 1px solid #ccc; outline: none; flex: 1;">
                 <input type="email" placeholder="Nhập địa chỉ email của bạn" style="padding: 10px 15px; border: none; outline: none; flex: 2;">
-                <button style="background: #f26522; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-right: 1px solid #d84b0f;">NAM</button>
-                <button style="background: #f26522; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold;">NỮ</button>
+                <button style="background: #105b4d; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-right: 1px solid #d84b0f;">NAM</button>
+                <button style="background: #105b4d; color: #fff; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold;">NỮ</button>
             </div>
         </div>
     </div>
@@ -432,8 +548,14 @@
         </div>
 
         <div class="input-group" style="margin-bottom: 15px;">
-            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link ảnh</label>
-            <input type="text" id="edit-book-image" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Ảnh bìa sách</label>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <p style="margin: 0 0 5px 0; font-size: 13px; color: #555; font-weight: bold;">Cách 1: Tải ảnh mới từ máy tính</p>
+                <input type="file" id="edit-book-image-file" accept="image/*" style="width: 100%; margin-bottom: 10px;">
+                
+                <p style="margin: 0 0 5px 0; font-size: 13px; color: #555; font-weight: bold;">Cách 2: Hoặc dùng link URL ảnh</p>
+                <input type="text" id="edit-book-image" placeholder="Dán link URL vào đây..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+            </div>
         </div>
         <div class="input-group" style="margin-bottom: 15px;">
             <label style="display: block; font-weight: bold; margin-bottom: 5px;">Mô tả</label>
@@ -464,9 +586,9 @@
                 <div id="login-form-area">
                     <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 10px 15px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; outline: none;">
                     <input type="password" id="login-password" placeholder="Mật khẩu" style="width: 100%; padding: 10px 15px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; outline: none;">
-                    <button onclick="loginWithEmail()" style="width: 100%; background: #f26522; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer;">Đăng nhập</button>
+                    <button onclick="loginWithEmail()" style="width: 100%; background: #105b4d; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer;">Đăng nhập</button>
                     <div style="background: #f9f9f9; padding: 15px; text-align: center; margin: 20px -30px -25px -30px; border-top: 1px solid #eee;">
-                        <span style="font-size: 13px; color: #666;">Chưa có tài khoản ? <a href="#" onclick="showRegisterForm()" style="color: #f26522; text-decoration: none;">Đăng ký tại đây</a></span>
+                        <span style="font-size: 13px; color: #666;">Chưa có tài khoản ? <a href="#" onclick="showRegisterForm()" style="color: #105b4d; text-decoration: none;">Đăng ký tại đây</a></span>
                     </div>
                 </div>
 
@@ -474,9 +596,9 @@
                     <input type="text" id="reg-name" placeholder="Họ tên" style="width: 100%; padding: 10px 15px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; outline: none;">
                     <input type="email" id="reg-email" placeholder="Email" style="width: 100%; padding: 10px 15px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; outline: none;">
                     <input type="password" id="reg-password" placeholder="Mật khẩu" style="width: 100%; padding: 10px 15px; margin-bottom: 20px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; outline: none;">
-                    <button onclick="registerWithEmail()" style="width: 100%; background: #f26522; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer;">Đăng ký</button>
+                    <button onclick="registerWithEmail()" style="width: 100%; background: #105b4d; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer;">Đăng ký</button>
                     <div style="background: #f9f9f9; padding: 15px; text-align: center; margin: 20px -30px -25px -30px; border-top: 1px solid #eee;">
-                        <span style="font-size: 13px; color: #666;">Đã có tài khoản ? <a href="#" onclick="showLoginForm()" style="color: #f26522; text-decoration: none;">Đăng nhập tại đây</a></span>
+                        <span style="font-size: 13px; color: #666;">Đã có tài khoản ? <a href="#" onclick="showLoginForm()" style="color: #105b4d; text-decoration: none;">Đăng nhập tại đây</a></span>
                     </div>
                 </div>
             </div>
@@ -494,61 +616,309 @@
 </div>
 
 <div id="bannerModal" class="modal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);">
-    <div class="modal-content" style="background: #fff; margin: 5% auto; padding: 25px; width: 500px; border-radius: 8px;">
+    <div class="modal-content" style="background: #fff; margin: 2% auto; padding: 25px; width: 750px; border-radius: 8px; max-height: 90vh; overflow-y: auto;">
         <span onclick="document.getElementById('bannerModal').style.display='none'" style="float: right; cursor: pointer; font-size: 28px; color: #888;">&times;</span>
-        <h2 style="color: #C92127; margin-bottom: 20px; border-bottom: 2px solid #C92127; padding-bottom: 10px; display: inline-block;">🖼️ Cập nhật Banner</h2>
+        <h2 style="color: #105b4d; margin-bottom: 10px; border-bottom: 2px solid #105b4d; padding-bottom: 10px; display: inline-block;">🖼️ Cập nhật Banner (Tối đa 10 ảnh)</h2>
+        <p style="font-size: 13px; color: #666; margin-bottom: 20px; font-style: italic;">Mẹo: Chọn ảnh từ máy tính HOẶC dán link URL. Ô nào để trống hệ thống sẽ tự động bỏ qua.</p>
         
-        <div class="input-group" style="margin-bottom: 15px;">
-            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link Ảnh Banner 1:</label>
-            <input type="text" id="admin-banner-1" placeholder="Dán link ảnh 1 vào đây..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
-        <div class="input-group" style="margin-bottom: 15px;">
-            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link Ảnh Banner 2:</label>
-            <input type="text" id="admin-banner-2" placeholder="Dán link ảnh 2 vào đây..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
-        </div>
-        <div class="input-group" style="margin-bottom: 20px;">
-            <label style="display: block; font-weight: bold; margin-bottom: 5px;">Link Ảnh Banner 3:</label>
-            <input type="text" id="admin-banner-3" placeholder="Dán link ảnh 3 vào đây..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 1:</label>
+                <input type="file" id="admin-banner-file-1" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-1" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 2:</label>
+                <input type="file" id="admin-banner-file-2" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-2" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 3:</label>
+                <input type="file" id="admin-banner-file-3" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-3" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 4:</label>
+                <input type="file" id="admin-banner-file-4" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-4" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 5:</label>
+                <input type="file" id="admin-banner-file-5" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-5" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 6:</label>
+                <input type="file" id="admin-banner-file-6" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-6" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 7:</label>
+                <input type="file" id="admin-banner-file-7" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-7" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 8:</label>
+                <input type="file" id="admin-banner-file-8" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-8" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 9:</label>
+                <input type="file" id="admin-banner-file-9" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-9" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
+            <div style="background: #f9f9f9; padding: 10px; border: 1px dashed #ccc; border-radius: 4px;">
+                <label style="font-weight: bold; font-size: 13px; color: #105b4d; display: block; margin-bottom: 5px;">Banner 10:</label>
+                <input type="file" id="admin-banner-file-10" accept="image/*" style="width: 100%; margin-bottom: 8px; font-size: 12px;">
+                <input type="text" id="admin-banner-url-10" placeholder="Hoặc dán URL..." style="width: 100%; padding: 6px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px;">
+            </div>
         </div>
         
         <button onclick="saveBannersToFirebase()" style="width: 100%; background: #28a745; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">LƯU BANNER</button>
     </div>
 </div>
-
 <div id="adminHubModal" class="modal" style="display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7);">
     <div class="modal-content" style="background: #f4f6f9; margin: 5% auto; padding: 30px; width: 700px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
         <span onclick="document.getElementById('adminHubModal').style.display='none'" style="float: right; cursor: pointer; font-size: 28px; color: #555;">&times;</span>
-        <h2 style="color: #C92127; border-bottom: 2px solid #C92127; padding-bottom: 10px; margin-bottom: 25px; text-transform: uppercase;">⚙️ Trung Tâm Quản Trị Hệ Thống</h2>
+        <h2 style="color: #105b4d; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 25px; text-transform: uppercase;">⚙️ Trung Tâm Quản Trị Hệ Thống</h2>
 
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
             
-            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('addBookModal').style.display='block';">
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('addBookModal').style.display='block';">
                 <div style="font-size: 45px; margin-bottom: 15px;">📚</div>
                 <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Đăng Sách Mới</h3>
                 <p style="font-size: 13px; color: #777; margin: 0;">Thêm sản phẩm mới vào kho sách</p>
             </div>
 
-            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; openOrderManager();">
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; openOrderManager();">
                 <div style="font-size: 45px; margin-bottom: 15px;">📦</div>
                 <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Quản Lý Đơn Hàng</h3>
                 <p style="font-size: 13px; color: #777; margin: 0;">Xem, duyệt và xử lý đơn đặt hàng</p>
             </div>
 
-            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('bannerModal').style.display='block';">
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('bannerModal').style.display='block';">
                 <div style="font-size: 45px; margin-bottom: 15px;">🖼️</div>
                 <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Cấu Hình Banner</h3>
                 <p style="font-size: 13px; color: #777; margin: 0;">Đổi ảnh quảng cáo tự chạy ở trang chủ</p>
             </div>
 
-            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#C92127'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="alert('Tính năng Thống kê doanh thu đang được phát triển và sẽ ra mắt ở phiên bản sau!');">
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; openStatsManager();">
                 <div style="font-size: 45px; margin-bottom: 15px;">📊</div>
-                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Báo Cáo Thống Kê</h3>
-                <p style="font-size: 13px; color: #777; margin: 0;">Xem biểu đồ doanh thu và lượng truy cập</p>
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Báo Cáo Thống Kê</h3> 
+             </div>
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" 
+                 onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" 
+                 onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" 
+                 onclick="document.getElementById('adminHubModal').style.display='none'; alert('Tính năng đang phát triển: Hệ thống đang kết nối danh sách Firebase Auth...');">
+                <div style="font-size: 45px; margin-bottom: 15px;">👥</div>
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Quản Lý Thành Viên</h3>
+                <p style="font-size: 13px; color: #777; margin: 0;">Xem danh sách khách hàng đã đăng ký</p>
             </div>
-
+            <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; openFlashSaleManager();">
+                <div style="font-size: 45px; margin-bottom: 15px;">⚡</div>
+                <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Quản Lý Flash Sale</h3>
+                <p style="font-size: 13px; color: #777; margin: 0;">Thêm sách và cài % giảm giá</p>
+            </div>
         </div>
     </div>
 </div>
 
+<div id="statsModal" class="modal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);">
+    <div class="modal-content" style="background: #f4f6f9; margin: 5% auto; padding: 30px; width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 90vh; overflow-y: auto;">
+        <span onclick="document.getElementById('statsModal').style.display='none'" style="float: right; cursor: pointer; font-size: 28px; color: #555;">&times;</span>
+        <h2 style="color: #105b4d; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 25px; text-transform: uppercase;">📊 Báo Cáo Thống Kê TYTBOOKS</h2>
+        
+        <div id="stats-loading" style="text-align: center; color: #666; font-weight: bold; margin-bottom: 20px; font-size: 16px;">⏳ Đang tính toán dữ liệu từ hệ thống...</div>
+
+        <div id="stats-dashboard" style="display: none; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+            <div onclick="showStatsDetail('revenue')" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid #28a745; cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <h3 style="margin: 0 0 10px 0; color: #666; font-size: 15px; text-transform: uppercase;">Tổng Doanh Thu</h3>
+                <p id="stat-revenue" style="margin: 0; font-size: 28px; font-weight: 900; color: #28a745;">0 đ</p>
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #999;">Từ đơn "Đã giao" <b style="color:#28a745;">(Bấm để xem)</b></p>
+            </div>
+
+            <div onclick="showStatsDetail('orders')" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid #007bff; cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <h3 style="margin: 0 0 10px 0; color: #666; font-size: 15px; text-transform: uppercase;">Tổng Đơn Hàng</h3>
+                <p id="stat-orders" style="margin: 0; font-size: 28px; font-weight: 900; color: #007bff;">0</p>
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #999;">Tất cả đơn hàng <b style="color:#007bff;">(Bấm để xem)</b></p>
+            </div>
+
+            <div onclick="showStatsDetail('pending')" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid #f39c12; cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <h3 style="margin: 0 0 10px 0; color: #666; font-size: 15px; text-transform: uppercase;">Đơn Chờ Xử Lý</h3>
+                <p id="stat-pending" style="margin: 0; font-size: 28px; font-weight: 900; color: #f39c12;">0</p>
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #999;">Cần giao cho khách <b style="color:#f39c12;">(Bấm để xem)</b></p>
+            </div>
+
+            <div onclick="showStatsDetail('books')" style="background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-left: 6px solid #17a2b8; cursor: pointer; transition: 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <h3 style="margin: 0 0 10px 0; color: #666; font-size: 15px; text-transform: uppercase;">Sách Đang Bán</h3>
+                <p id="stat-books" style="margin: 0; font-size: 28px; font-weight: 900; color: #17a2b8;">0</p>
+                <p style="margin: 8px 0 0 0; font-size: 13px; color: #999;">Sách hiện có trong kho <b style="color:#17a2b8;">(Bấm để xem)</b></p>
+            </div>
+        </div>
+
+        <div id="stats-detail-view" style="display: none;">
+            <button onclick="backToStatsDashboard()" style="margin-bottom: 15px; background: #555; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">⬅ Quay lại Bảng Tổng Hợp</button>
+            <h3 id="detail-title" style="color: #333; margin-top: 0; border-bottom: 2px solid #ccc; padding-bottom: 10px;">Chi tiết</h3>
+            <div id="detail-content" style="background: #fff; padding: 0; border-radius: 8px; border: 1px solid #eee; overflow: hidden;">
+                </div>
+        </div>
+    </div>
+</div>
+<div id="floating-contact-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 15px;">
+
+        <div id="contact-menu" style="display: none; background: #fff; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.18); overflow: hidden; width: 290px; flex-direction: column; border: 1px solid #eee; animation: fadeContactMenu 0.4s ease-out;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 10px; border-bottom: 1px solid #f1f1f1;">
+                <h4 style="margin: 0; color: #105b4d; font-size: 15px; text-transform: uppercase;">Liên hệ với TYTBOOKS</h4>
+                <span onclick="toggleContactMenu()" style="cursor: pointer; font-size: 24px; color: #aaa; line-height: 1;">&times;</span>
+            </div>
+            
+            <a href="tel:0866643XXX" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; border-bottom: 1px solid #f9f9f9; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
+                <div class="contact-icon-circle" style="background: #e74c3c; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(231,76,60,0.3);">
+                    <svg class="svg-shake" style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
+                        <path d="M20 22.62a3.3 3.3 0 0 1-2.32-.97l-2.07-2.07a11.51 11.51 0 0 1-3.61-2 11.39 11.39 0 0 1-2-3.62l-2.06-2.06a3.29 3.29 0 0 1-.01-4.63L9.67 5.56a3.29 3.29 0 0 1 4.64 0l1.29 1.29a2 2 0 0 1 0 2.82l-1.06 1.06a1.5 1.5 0 0 0-.44 1.06 1.48 1.48 0 0 0 .44 1.06 6 6 0 0 0 4.24 4.24 1.48 1.48 0 0 0 1.06-.44l1.06-1.06a2 2 0 0 1 2.83 0l1.29 1.29a3.3 3.3 0 0 1 .01 4.63l-1.74 1.74a3.3 3.3 0 0 1-2.33.98z"/>
+                    </svg>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: bold; color: #e74c3c; margin-bottom: 2px;">Hotline 24/7</div>
+                    <div style="font-size: 13px; color: #666;">Gọi ngay: 0866.643.XXX</div>
+                </div>
+            </a>
+            
+            <a href="https://zalo.me/0866643XXX" target="_blank" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; border-bottom: 1px solid #f9f9f9; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
+                <div class="contact-icon-circle" style="background: #0088cc; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(0,136,204,0.3);">
+                    <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
+                        <path d="M12 2C6.477 2 2 6.146 2 11.26c0 2.91 1.446 5.5 3.705 7.158V22l3.41-1.87a11.233 11.233 0 0 0 2.885.372c5.523 0 10-4.146 10-9.262S17.523 2 12 2zm1.611 11.916l-2.484-2.656-4.836 2.656 5.319-5.642 2.553 2.656 4.767-2.656-5.319 5.642z"/>
+                    </svg>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: bold; color: #0088cc; margin-bottom: 2px;">Chat Zalo</div>
+                    <div style="font-size: 13px; color: #666;">Hỗ trợ khách hàng qua Zalo</div>
+                </div>
+            </a>
+            
+            <a href="#" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
+                <div class="contact-icon-circle" style="background: #1abc9c; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(26,188,156,0.3);">
+                    <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24">
+                        <path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/>
+                    </svg>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: bold; color: #1abc9c; margin-bottom: 2px;">Gửi Yêu Cầu</div>
+                    <div style="font-size: 13px; color: #666;">Đăng kí thông tin hoặc lời nhắn</div>
+                </div>
+            </a>
+        </div>
+
+        <div style="position: relative;">
+            <div style="position: absolute; top: -5px; left: -5px; width: 70px; height: 70px; background: rgba(16,91,77,0.3); border-radius: 50%; animation: pulseContact 2s infinite;"></div>
+            
+            <button id="btn-toggle-contact" onclick="toggleContactMenu()" style="width: 60px; height: 60px; border-radius: 50%; background: #105b4d; color: white; border: 3px solid rgba(255,255,255,0.7); box-shadow: 0 4px 15px rgba(16,91,77,0.4); cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s; outline: none; position: relative; z-index: 2; overflow: hidden;">
+                <div id="contact-icons-wrap" style="position: relative; width: 30px; height: 30px; transition: transform 0.4s;">
+                    <svg class="contact-icon-active" style="width: 30px; height: 30px; fill: white; position: absolute; top: 0; left: 0; transition: 0.3s;" viewBox="0 0 24 24">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+                    </svg>
+                    <svg class="contact-icon-close" style="width: 30px; height: 30px; fill: white; position: absolute; top: 0; left: 0; opacity: 0; transform: scale(0.5); transition: 0.3s;" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                    </svg>
+                </div>
+            </button>
+        </div>
+
+    </div>
+
+    <style>
+        /* Hiệu ứng lan tỏa (pulse) cho nút tròn */
+        @keyframes pulseContact {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+        /* Hiệu ứng hiện menu mượt mà */
+        @keyframes fadeContactMenu {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        /* Hiệu ứng xoay icon điện thoại giống trang gốc */
+        .contact-icon-circle:hover .svg-shake {
+            animation: phoneShake 0.5s infinite;
+        }
+        @keyframes phoneShake {
+            0% { transform: rotate(0); }
+            25% { transform: rotate(15deg); }
+            50% { transform: rotate(0); }
+            75% { transform: rotate(-15deg); }
+            100% { transform: rotate(0); }
+        }
+    </style>
+
+    <script>
+        function toggleContactMenu() {
+            const menu = document.getElementById('contact-menu');
+            const iconsWrap = document.getElementById('contact-icons-wrap');
+            const iconActive = iconsWrap.querySelector('.contact-icon-active');
+            const iconClose = iconsWrap.querySelector('.contact-icon-close');
+            
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                // MỞ MENU
+                menu.style.display = 'flex';
+                // 1. Tạo hiệu ứng xoay cho toàn bộ khối icon
+                iconsWrap.style.transform = 'rotate(180deg)';
+                // 2. Ẩn icon chat, hiện icon dấu X mượt mà
+                iconActive.style.opacity = '0';
+                iconActive.style.transform = 'scale(0.5)';
+                iconClose.style.opacity = '1';
+                iconClose.style.transform = 'scale(1)';
+            } else {
+                // ĐÓNG MENU
+                menu.style.display = 'none';
+                // 1. Xoay icon về vị trí cũ
+                iconsWrap.style.transform = 'rotate(0deg)';
+                // 2. Hiện lại icon chat, ẩn icon dấu X
+                iconActive.style.opacity = '1';
+                iconActive.style.transform = 'scale(1)';
+                iconClose.style.opacity = '0';
+                iconClose.style.transform = 'scale(0.5)';
+            }
+        }
+    </script>
+   
+    <div id="flashSaleModal" class="modal" style="display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); align-items: center; justify-content: center;">
+        <div class="modal-content" style="background: #fff; padding: 30px; width: 680px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); max-height: 90vh; display: flex; flex-direction: column;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 28px;">⚡</span>
+                    <h2 style="margin: 0; color: #fff; font-size: 24px; font-style: italic;">FLASH SALE</h2>
+                </div>
+                
+                <button onclick="window.location.href='products.html?flashsale=true'" style="color: #105b4d; text-decoration: none; font-size: 14px; font-weight: bold; background: #fff; padding: 8px 20px; border-radius: 20px; border: none; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">Xem tất cả ›</button>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #eaeaea; margin-bottom: 25px;">
+                <h4 style="margin: 0 0 15px 0; color: #333; font-size: 16px;">1. Thêm sách vào chương trình</h4>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 15px; align-items: flex-end;">
+                    <div style="flex: 3; min-width: 0;"> 
+                        <label style="display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: bold;">Chọn sách từ kho</label>
+                        <select id="fs-book-select" style="width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer; text-overflow: ellipsis;">
+                            <option value="">-- Đang tải dữ liệu kho sách... --</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 100px;">
+                        <label style="display: block; font-size: 13px; color: #666; margin-bottom: 6px; font-weight: bold;">% Giảm giá</label>
+                        <input type="number" id="fs-discount" placeholder="VD: 20" style="width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; outline: none; box-sizing: border-box;" min="1" max="99">
+                    </div>
+                </div>
+                
+                <button onclick="addToFlashSale()" style="width: 100%; background: #e74c3c; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; box-shadow: 0 4px 6px rgba(231,76,60,0.2);" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'">+ THÊM VÀO FLASH SALE</button>
+            </div>
+
+            <h4 style="margin: 0 0 10px 0; color: #333; font-size: 16px;">2. Sách đang chạy Flash Sale</h4>
+            <div id="fs-active-list" style="flex: 1; overflow-y: auto; border: 1px solid #eaeaea; border-radius: 8px; padding: 15px; min-height: 150px; background: #fff;">
+                <p style="text-align: center; color: #999; margin-top: 30px;">Đang tải danh sách...</p>
+            </div>
+            
+        </div>
+    </div>
 </body>
 </html>
