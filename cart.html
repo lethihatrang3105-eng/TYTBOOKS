@@ -2,162 +2,571 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Giỏ hàng - TYTBOOKS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giỏ Hàng & Thanh Toán - TYTBOOKS</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .cart-container { max-width: 1200px; margin: 30px auto; padding: 0 20px; font-family: Arial, sans-serif; }
-        .cart-title { font-size: 24px; font-weight: normal; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eaeaea; }
-        .cart-content { display: flex; gap: 30px; }
-        .cart-items { flex: 3; }
-        .cart-summary { flex: 1; }
+        /* CSS DÀNH RIÊNG CHO TRANG THANH TOÁN */
+        body { background-color: #f4f6f9; font-family: Arial, sans-serif; }
+        .checkout-container { max-width: 1100px; margin: 30px auto; background: transparent; }
+        .checkout-header { text-align: center; color: #105b4d; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; font-size: 24px; font-weight: bold; }
         
-        /* Box tóm tắt đơn hàng bên phải */
-        .summary-box { background: #f9f9f9; padding: 20px; border: 1px solid #eaeaea; text-align: center; }
-        .summary-box .total-qty { font-weight: bold; font-size: 16px; margin-bottom: 10px; }
-        .summary-box .total-price { color: #d9534f; font-size: 24px; font-weight: bold; margin-bottom: 5px; }
-        .summary-box .note { color: #666; font-size: 12px; margin-bottom: 20px; }
-        .btn-checkout { background: #f26522; color: white; width: 100%; padding: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        .btn-checkout:hover { background: #d84b0f; }
+        /* Stepper (Thanh tiến trình) */
+        .stepper { display: flex; justify-content: center; align-items: center; margin-bottom: 40px; font-size: 14px; font-weight: bold; color: #999; }
+        .step { display: flex; align-items: center; gap: 8px; }
+        .step.active { color: #f26522; } /* Màu cam cho bước hiện tại */
+        .step.done { color: #105b4d; }   /* Màu xanh cho bước đã xong */
+        .step-circle { width: 24px; height: 24px; border-radius: 50%; background: #ccc; color: white; display: flex; justify-content: center; align-items: center; font-size: 12px; }
+        .step.active .step-circle { background: #f26522; }
+        .step.done .step-circle { background: #105b4d; }
+        .step-line { width: 100px; height: 2px; background: #ccc; margin: 0 15px; }
 
-        /* Item trong giỏ hàng */
-        .cart-item { display: flex; align-items: center; padding: 20px 0; border-bottom: 1px solid #eaeaea; }
-        .item-img { width: 80px; height: 110px; object-fit: cover; border: 1px solid #ddd; margin-right: 20px; }
-        .item-info { flex: 2; font-size: 14px; line-height: 1.6; }
-        .item-info a { color: #007bff; text-decoration: none; }
-        .item-info .actions { font-size: 12px; margin-top: 10px; }
-        .item-info .actions a { color: #d9534f; cursor: pointer; }
+        /* Layout 2 cột */
+        .checkout-grid { display: flex; gap: 30px; align-items: flex-start; }
+        .checkout-left { flex: 1.5; }
+        .checkout-right { flex: 1; background: #f9f9f9; padding: 25px; border-radius: 8px; border: 1px solid #eaeaea; position: sticky; top: 20px; }
+
+        /* Card Thông tin (Info Card) */
+        .info-card { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 25px; border: 1px solid #eaeaea; }
+        .info-card h3 { margin: 0 0 20px 0; font-size: 16px; color: #333; text-transform: uppercase; border-bottom: 2px solid #105b4d; padding-bottom: 10px; display: inline-block; }
         
-        .item-price { flex: 1; font-weight: bold; font-size: 16px; text-align: center; }
-        
-        .item-qty { display: flex; align-items: center; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; height: 35px; }
-        .item-qty button { background: #fff; border: none; width: 30px; cursor: pointer; font-size: 16px; }
-        .item-qty input { width: 40px; text-align: center; border: none; border-left: 1px solid #ccc; border-right: 1px solid #ccc; height: 100%; outline: none; pointer-events: none;}
+        /* Form Inputs */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #555; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: inherit; font-size: 14px; transition: 0.3s; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #105b4d; outline: none; box-shadow: 0 0 5px rgba(16,91,77,0.2); }
+
+        /* Radio buttons với icon */
+        .radio-option { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px; cursor: pointer; transition: 0.2s; font-size: 14px; color: #444; }
+        .radio-option:hover { background: #f1f8f6; border-color: #105b4d; }
+        .radio-option input[type="radio"] { transform: scale(1.2); cursor: pointer; }
+
+        /* Nút bấm (Buttons) */
+        .btn-orange { background: #f26522; color: white; border: none; padding: 15px; border-radius: 4px; width: 100%; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; text-transform: uppercase; box-shadow: 0 4px 6px rgba(242,101,34,0.2); outline: none;}
+        .btn-orange:hover { background: #d35400; }
+        .btn-gray { background: #e9ecef; color: #333; border: none; padding: 15px; border-radius: 4px; width: 100%; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; outline: none;}
+        .btn-gray:hover { background: #d3d9df; }
     </style>
 </head>
 <body>
 
-    <header class="header">
-        <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+    <div id="top-auth-bar" style="background: #0b4036; border-bottom: 1px solid #09332b; padding: 6px 0;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; padding: 0 20px; gap: 20px; font-size: 13px;">
+            <span id="user-greeting" style="display: none; color: #fff; font-weight: bold;"></span>
+            <a href="index.html" style="color: #ddd; text-decoration: none;">🏠 Quay về trang chủ</a>
+        </div>
+    </div>
+    <header class="header" style="background: #105b4d; padding: 15px 0;">
+        <div class="header-container" style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
             <div class="logo">
-                <h1><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
+                <h1 style="margin: 0; color: #fff;"><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
             </div>
-            <div class="search-bar" style="flex: 1; margin: 0 50px;">
-                <div style="display: flex; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; max-width: 500px; margin: auto;">
-                    <input type="text" placeholder="Bạn cần tìm gì?" style="width: 100%; padding: 10px 15px; border: none; outline: none;">
-                    <button style="padding: 10px 20px; background-color: #fff; border: none; cursor: pointer; border-left: 1px solid #ccc; color: #f26522; font-weight: bold;">🔍</button>
-                </div>
-            </div>
-            <div class="user-actions" style="display: flex; align-items: center; gap: 30px;">
-                <div style="display: flex; align-items: center; gap: 10px; color: #f26522;">
-                    <span style="font-size: 28px;">🎧</span>
-                    <div>
-                        <div style="font-weight: bold; font-size: 16px;">0933 109 009</div>
-                        <div style="font-size: 12px; color: #666;">Hot line</div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <span style="font-size: 24px; color: #f26522;">🛒</span>
-                    <a href="cart.html" id="cart-count-text" style="color: #f26522; font-weight: bold; text-decoration: none; font-size: 14px;">Giỏ hàng</a>
+            <div style="display: flex; align-items: center; gap: 10px; color: #fff;">
+                <span style="font-size: 28px;">🎧</span>
+                <div>
+                    <div style="font-weight: bold; font-size: 16px;">0866 643 XXX</div>
+                    <div style="font-size: 12px; color: #ddd;">Hot line hỗ trợ đơn hàng</div>
                 </div>
             </div>
         </div>
     </header>
 
-    <div class="cart-container">
-        <h2 class="cart-title">Giỏ hàng</h2>
+    <div class="checkout-container">
         
-        <div class="cart-content" id="cart-content-wrapper">
+        <div id="view-cart" style="display: block;">
+            <h2 style="color: #333; margin-bottom: 25px; font-size: 22px;">Giỏ hàng của bạn</h2>
+            
+            <div class="checkout-grid">
+                <div class="checkout-left" style="background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <div id="cart-items-container">
+                        </div>
+                </div>
+                
+                <div class="checkout-right">
+                    <h3 style="margin: 0 0 20px 0; font-size: 16px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">Tổng cộng giỏ hàng</h3>
+                    <div style="display: flex; justify-content: space-between; font-size: 15px; margin-bottom: 15px; color: #555;">
+                        <span>Tạm tính:</span>
+                        <strong id="cart-subtotal">0đ</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 25px; color: #333; align-items: center;">
+                        <span>Thành tiền:</span>
+                        <strong id="cart-total" style="color: #d0021b; font-size: 24px;">0đ</strong>
+                    </div>
+                    <p style="font-size: 12px; color: #999; text-align: center; margin-bottom: 15px;">(Đã bao gồm VAT nếu có)</p>
+                    <button onclick="goToCheckoutStep1()" class="btn-orange">Tiến hành đặt hàng</button>
+                    <button onclick="window.location.href='products.html'" class="btn-gray" style="background: transparent; color: #105b4d; border: 1px solid #105b4d;">Tiếp tục mua sắm</button>
+                </div>
             </div>
+        </div>
+
+        <div id="view-checkout-step1" style="display: none;">
+            <div class="checkout-header">TYTBOOKS - THANH TOÁN</div>
+            
+            <div class="stepper">
+                <div class="step active"><div class="step-circle">1</div> Điền thông tin</div>
+                <div class="step-line"></div>
+                <div class="step"><div class="step-circle">2</div> Xác nhận & Hoàn tất</div>
+            </div>
+
+            <div class="checkout-grid">
+                <div class="checkout-left">
+                    <div class="info-card">
+                        <h3>Địa chỉ giao hàng</h3>
+                        <div class="form-group">
+                            <label>Họ tên người nhận <span style="color: red;">*</span></label>
+                            <input type="text" id="order-name" placeholder="Nhập họ tên đầy đủ" required>
+                        </div>
+                        <div style="display: flex; gap: 15px;">
+                            <div class="form-group" style="flex: 1;">
+                                <label>Số điện thoại <span style="color: red;">*</span></label>
+                                <input type="text" id="order-phone" placeholder="VD: 0866643XXX" required>
+                            </div>
+                            <div class="form-group" style="flex: 1;">
+                                <label>Email (Không bắt buộc)</label>
+                                <input type="email" id="order-email" placeholder="Nhập email để nhận hóa đơn">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Địa chỉ nhận hàng chi tiết <span style="color: red;">*</span></label>
+                            <textarea id="order-address" rows="3" placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Phương thức vận chuyển & Thanh toán</h3>
+                        
+                        <label class="radio-option">
+                            <input type="radio" name="shipping" value="Giao hàng tiêu chuẩn (Miễn phí)" checked> 
+                            <span>Giao hàng tiêu chuẩn (Miễn phí)</span>
+                        </label>
+                        
+                        <div style="height: 15px;"></div>
+
+                        <label class="radio-option">
+                            <input type="radio" name="payment" value="Thanh toán tiền mặt khi nhận hàng (COD)" checked>
+                            <span>💵 Thanh toán tiền mặt khi nhận hàng (COD)</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="payment" value="Chuyển khoản Internet Banking">
+                            <span>💳 Chuyển khoản Internet Banking / Ví điện tử</span>
+                        </label>
+                    </div>
+
+                    <div class="info-card">
+                        <h3>Thông tin khác</h3>
+                        <div class="form-group">
+                            <label>Ghi chú cho đơn hàng</label>
+                            <textarea id="order-note" rows="2" placeholder="Ghi chú thêm cho cửa hàng (ví dụ: Giao giờ hành chính)..."></textarea>
+                        </div>
+                    </div>
+
+                    <button onclick="goToCheckoutStep2()" class="btn-orange">TIẾP TỤC ĐẾN BƯỚC 2 ➔</button>
+                    <button onclick="backToCart()" class="btn-gray">⬅ Quay lại giỏ hàng</button>
+                </div>
+                
+                <div class="checkout-right">
+                    <h3 style="margin: 0 0 15px 0; font-size: 15px; text-transform: uppercase;">Đơn hàng của bạn</h3>
+                    <div id="checkout-summary-items" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 15px;">
+                        </div>
+                    
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; color: #555;">
+                        <span>Tiền hàng:</span>
+                        <strong id="summary-subtotal">0đ</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; color: #555;">
+                        <span>Phí vận chuyển:</span>
+                        <strong>Miễn phí</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; color: #333; align-items: center; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <span>Tổng cộng:</span>
+                        <strong id="summary-total" style="color: #d0021b; font-size: 22px;">0đ</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-checkout-step2" style="display: none;">
+            <div class="checkout-header">TYTBOOKS - THANH TOÁN</div>
+            
+            <div class="stepper">
+                <div class="step done"><div class="step-circle">✔</div> Điền thông tin</div>
+                <div class="step-line" style="background: #105b4d;"></div>
+                <div class="step active"><div class="step-circle">2</div> Xác nhận & Hoàn tất</div>
+            </div>
+
+            <div class="checkout-grid">
+                <div class="checkout-left">
+                    
+                    <div class="info-card">
+                        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 20px;">
+                            <h3 style="border: none; padding: 0; margin: 0;">Thông tin giao hàng</h3>
+                            <a href="#" onclick="goToCheckoutStep1()" style="color: #007bff; text-decoration: none; font-size: 14px;">Sửa</a>
+                        </div>
+                        <div style="font-size: 14px; color: #444; line-height: 1.8;">
+                            <div><strong>Người nhận:</strong> <span id="confirm-name"></span></div>
+                            <div><strong>SĐT:</strong> <span id="confirm-phone"></span></div>
+                            <div><strong>Địa chỉ:</strong> <span id="confirm-address"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <h3 style="margin: 0 0 20px 0;">Xác nhận phương thức</h3>
+                        <div style="font-size: 14px; color: #444; line-height: 1.8;">
+                            <div><strong>Vận chuyển:</strong> <span id="confirm-shipping"></span></div>
+                            <div><strong>Thanh toán:</strong> <span id="confirm-payment"></span></div>
+                            <div id="confirm-note-box" style="display: none;"><strong>Ghi chú:</strong> <span id="confirm-note"></span></div>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 13px; color: #666; font-style: italic; margin-bottom: 15px;">Vui lòng kiểm tra kỹ lại đơn hàng của bạn trước khi bấm Xác nhận.</p>
+
+                    <button id="btnSubmitOrder" onclick="submitOrderToFirebase()" class="btn-orange" style="font-size: 18px; padding: 18px;">XÁC NHẬN ĐẶT MUA</button>
+                    <button onclick="goToCheckoutStep1()" class="btn-gray">⬅ Quay lại chỉnh sửa</button>
+                </div>
+                
+                <div class="checkout-right">
+                    <h3 style="margin: 0 0 15px 0; font-size: 15px; text-transform: uppercase;">Đơn hàng của bạn</h3>
+                    <div id="confirm-summary-items" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 15px;"></div>
+                    
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; color: #555;">
+                        <span>Tiền hàng:</span><strong id="confirm-subtotal">0đ</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 15px; color: #555;">
+                        <span>Phí vận chuyển:</span><strong>Miễn phí</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; color: #333; align-items: center; border-top: 1px solid #ddd; padding-top: 15px;">
+                        <span>Tổng cộng:</span><strong id="confirm-total" style="color: #d0021b; font-size: 22px;">0đ</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-success" style="display: none; text-align: center; background: #fff; padding: 60px 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 40px;">
+            <div style="font-size: 80px; color: #28a745; margin-bottom: 20px;">✔</div>
+            <h2 style="color: #105b4d; font-size: 28px; margin-bottom: 10px;">Đặt hàng thành công!</h2>
+            <p style="color: #666; font-size: 16px; margin-bottom: 30px;">Cảm ơn bạn đã mua sắm tại TYTBOOKS. Đơn hàng của bạn đang được xử lý và sẽ giao đến trong thời gian sớm nhất.</p>
+            <button onclick="window.location.href='index.html'" class="btn-orange" style="width: auto; padding: 15px 40px; border-radius: 30px;">Tiếp tục mua sắm</button>
+        </div>
+
     </div>
 
-    <script>
-        function renderCart() {
-            const cartWrapper = document.getElementById('cart-content-wrapper');
-            let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+    <script src="shop-logic.js?v=999"></script>
 
+    <script>
+        const formatMoney = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+        
+        // ==========================================
+        // 1. LOGIC TẢI GIỎ HÀNG (View Cart)
+        // ==========================================
+        function loadCart() {
+            let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+            const cartContainer = document.getElementById('cart-items-container');
+            const checkoutItems1 = document.getElementById('checkout-summary-items');
+            const checkoutItems2 = document.getElementById('confirm-summary-items');
+            
             if (cart.length === 0) {
-                cartWrapper.innerHTML = '<p style="text-align: center; width: 100%; padding: 50px; font-size: 18px; color: #666;">Giỏ hàng của bạn đang trống. <a href="index.html">Tiếp tục mua sắm</a></p>';
+                cartContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #999;">
+                        <div style="font-size: 60px; margin-bottom: 15px;">🛒</div>
+                        <p>Giỏ hàng của bạn đang trống.</p>
+                        <a href="products.html" style="color: #105b4d; font-weight: bold; text-decoration: none;">Đi mua sắm ngay</a>
+                    </div>`;
+                document.getElementById('cart-subtotal').innerText = '0đ';
+                document.getElementById('cart-total').innerText = '0đ';
                 return;
             }
 
-            let htmlItems = '<div class="cart-items">';
-            let totalPrice = 0;
-            let totalQty = 0;
+            let htmlCart = '';
+            let htmlSummary = '';
+            let total = 0;
 
             cart.forEach((item, index) => {
-                totalPrice += item.price * item.quantity;
-                totalQty += item.quantity;
-                const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price);
+                let itemTotal = item.price * item.quantity;
+                total += itemTotal;
 
-                htmlItems += `
-                    <div class="cart-item">
-                        <img src="${item.image}" class="item-img" alt="${item.title}">
-                        <div class="item-info">
-                            <p style="margin-bottom: 5px;">${index + 1}. ${item.title}</p>
-                            <p style="margin-bottom: 5px; color: #666;">Tác giả: <a href="#">${item.author || 'Đang cập nhật'}</a></p>
-                            <p style="color: #666;">Loại: Sách</p>
-                            <div class="actions">
-                                <a onclick="removeItem(${index})">Xóa</a> | <a style="color:#007bff;">Thêm vào yêu thích</a>
-                            </div>
+                // Giao diện list giỏ hàng chi tiết (bên trái)
+                htmlCart += `
+                    <div style="display: flex; align-items: center; padding: 15px 0; border-bottom: 1px solid #f1f1f1; gap: 20px;">
+                        <img src="${item.image}" style="width: 80px; height: 110px; object-fit: cover; border-radius: 4px; border: 1px solid #eee;">
+                        <div style="flex: 2;">
+                            <a href="detail.html?id=${item.id}" style="font-size: 15px; color: #333; font-weight: bold; text-decoration: none; display: block; margin-bottom: 10px;">${item.title}</a>
+                            <button onclick="removeFromCart(${index})" style="background: transparent; border: none; color: #e74c3c; cursor: pointer; font-size: 13px; padding: 0; outline: none;">🗑 Xóa</button>
                         </div>
-                        <div class="item-price">${formattedPrice}</div>
-                        <div class="item-qty">
-                            <button onclick="changeQty(${index}, -1)">-</button>
-                            <input type="text" value="${item.quantity}">
-                            <button onclick="changeQty(${index}, 1)">+</button>
+                        <div style="flex: 1; font-weight: bold; color: #333; text-align: center;">${formatMoney.format(item.price)}</div>
+                        <div style="flex: 1; display: flex; justify-content: center;">
+                            <div style="display: flex; align-items: center; border: 1px solid #ccc; border-radius: 4px; overflow: hidden; height: 36px; width: 100px;">
+                                <button onclick="changeQty(${index}, -1)" style="background: transparent; border: none; width: 30px; font-size: 18px; color: #666; cursor: pointer; outline: none;">-</button>
+                                <span style="flex: 1; text-align: center; font-size: 14px; font-weight: bold;">${item.quantity}</span>
+                                <button onclick="changeQty(${index}, 1)" style="background: transparent; border: none; width: 30px; font-size: 16px; color: #666; cursor: pointer; outline: none;">+</button>
+                            </div>
                         </div>
                     </div>
                 `;
-            });
-            htmlItems += '</div>';
 
-            const formattedTotal = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(totalPrice);
-            
-            const htmlSummary = `
-                <div class="cart-summary">
-                    <div class="summary-box">
-                        <div class="total-qty">${totalQty} sản phẩm</div>
-                        <div class="total-price">${formattedTotal}</div>
-                        <div class="note">(Chưa có cước vận chuyển)</div>
-                        <button class="btn-checkout" onclick="alert('Đang chuyển hướng thanh toán...')">Tiến hành đặt hàng</button>
+                // Giao diện list rút gọn (bên phải tóm tắt) - nhỏ gọn hơn
+                htmlSummary += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 13px; color: #444; align-items: flex-start;">
+                        <div style="flex: 1; padding-right: 15px;">
+                            <span style="color: #007bff; font-weight: bold;">${item.quantity} x</span> ${item.title}
+                        </div>
+                        <div style="font-weight: bold; color: #333; white-space: nowrap;">${formatMoney.format(itemTotal)}</div>
                     </div>
-                </div>
-            `;
+                `;
+            });
 
-            cartWrapper.innerHTML = htmlItems + htmlSummary;
+            cartContainer.innerHTML = htmlCart;
+            checkoutItems1.innerHTML = htmlSummary;
+            checkoutItems2.innerHTML = htmlSummary;
+
+            let formattedTotal = formatMoney.format(total);
+            document.getElementById('cart-subtotal').innerText = formattedTotal;
+            document.getElementById('cart-total').innerText = formattedTotal;
+            // Cập nhật giá sang các vùng summary ẩn
+            document.getElementById('summary-subtotal').innerText = formattedTotal;
+            document.getElementById('summary-total').innerText = formattedTotal;
+            document.getElementById('confirm-subtotal').innerText = formattedTotal;
+            document.getElementById('confirm-total').innerText = formattedTotal;
         }
 
-        // Hàm thay đổi số lượng
-        function changeQty(index, change) {
+        // Tăng giảm số lượng, Xóa
+        function changeQty(index, delta) {
             let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
-            cart[index].quantity += change;
-            if (cart[index].quantity <= 0) cart.splice(index, 1); // Xóa nếu số lượng = 0
-            localStorage.setItem('tyt_cart', JSON.stringify(cart));
-            renderCart();
+            if (cart[index]) {
+                cart[index].quantity += delta;
+                if (cart[index].quantity <= 0) {
+                    cart.splice(index, 1);
+                }
+                localStorage.setItem('tyt_cart', JSON.stringify(cart));
+                loadCart();
+                // Cập nhật số lượng trên Header nếu có hàm này trong shop-logic.js
+                if(typeof updateHeaderCartOnHome === 'function') updateHeaderCartOnHome();
+            }
         }
 
-        // Hàm xóa sản phẩm
-        function removeItem(index) {
+        function removeFromCart(index) {
             let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
             cart.splice(index, 1);
             localStorage.setItem('tyt_cart', JSON.stringify(cart));
-            renderCart();
+            loadCart();
+            if(typeof updateHeaderCartOnHome === 'function') updateHeaderCartOnHome();
         }
 
-        // Chạy hàm vẽ giỏ hàng khi mở trang
-        renderCart();
-    </script>
-    <script>
-    // Lắng nghe mọi cú click trên trang giỏ hàng
-    document.addEventListener('click', function(event) {
-        let phanTuDuocClick = event.target;
-        
-        // Nếu phần tử được click là một cái Nút (BUTTON) và có chứa chữ "đặt hàng"
-        if (phanTuDuocClick.tagName === 'BUTTON' && phanTuDuocClick.innerText.toLowerCase().includes('đặt hàng')) {
-            // Chuyển hướng sang trang thanh toán
-            window.location.href = 'thanh-toan.html';
+        // ==========================================
+        // 2. ĐIỀU HƯỚNG CÁC BƯỚC THANH TOÁN (Logic quan trọng)
+        // ==========================================
+        const views = ['view-cart', 'view-checkout-step1', 'view-checkout-step2', 'view-success'];
+
+        function showView(viewId) {
+            views.forEach(id => {
+                document.getElementById(id).style.display = (id === viewId) ? 'block' : 'none';
+            });
+            window.scrollTo(0,0); // Cuộn lên đầu trang khi chuyển bước
         }
-    });
-</script>
+
+        function backToCart() {
+            showView('view-cart');
+        }
+
+        function goToCheckoutStep1() {
+            let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+            if (cart.length === 0) {
+                alert("Giỏ hàng của bạn đang trống!");
+                return;
+            }
+            showView('view-checkout-step1');
+        }
+
+        // Từ Bước 1 sang Bước 2: Điền thông tin -> Review
+        function goToCheckoutStep2() {
+            // Lấy dữ liệu & Bắt lỗi bắt buộc
+            const name = document.getElementById('order-name').value.trim();
+            const phone = document.getElementById('order-phone').value.trim();
+            const address = document.getElementById('order-address').value.trim();
+            
+            if(!name || !phone || !address) {
+                alert("Vui lòng điền đầy đủ Họ tên, Số điện thoại và Địa chỉ nhận hàng!");
+                return;
+            }
+
+            // Gán dữ liệu sang bảng Xác nhận (Bước 2)
+            document.getElementById('confirm-name').innerText = name;
+            document.getElementById('confirm-phone').innerText = phone;
+            document.getElementById('confirm-address').innerText = address;
+            
+            document.getElementById('confirm-shipping').innerText = document.querySelector('input[name="shipping"]:checked').value;
+            document.getElementById('confirm-payment').innerText = document.querySelector('input[name="payment"]:checked').value;
+            
+            const note = document.getElementById('order-note').value.trim();
+            if(note) {
+                document.getElementById('confirm-note').innerText = note;
+                document.getElementById('confirm-note-box').style.display = 'block';
+            } else {
+                document.getElementById('confirm-note-box').style.display = 'none';
+            }
+
+            // Chuyển sang View Xác nhận
+            showView('view-checkout-step2');
+        }
+
+        // ==========================================
+        // 3. GỬI ĐƠN HÀNG LÊN FIREBASE ADMIN
+        // ==========================================
+        async function submitOrderToFirebase() {
+            const btn = document.getElementById('btnSubmitOrder');
+            btn.innerText = "ĐANG XỬ LÝ...";
+            btn.disabled = true; // Chống bấm 2 lần
+
+            try {
+                let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+                let total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                // Gom dữ liệu đơn hàng
+                const orderData = {
+                    customerName: document.getElementById('order-name').value.trim(),
+                    customerPhone: document.getElementById('order-phone').value.trim(),
+                    customerEmail: document.getElementById('order-email').value.trim(),
+                    customerAddress: document.getElementById('order-address').value.trim(),
+                    shippingMethod: document.querySelector('input[name="shipping"]:checked').value,
+                    paymentMethod: document.querySelector('input[name="payment"]:checked').value,
+                    note: document.getElementById('order-note').value.trim(),
+                    items: cart, // Chi tiết các sản phẩm
+                    totalAmount: total,
+                    status: "Chờ xử lý", // Trạng thái đơn hàng mới
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp() // Thời gian đặt hàng chuẩn
+                };
+
+                // Đẩy lên collection "orders"
+                if(typeof db === 'undefined') {
+                    alert("Lỗi kết nối Firebase dữ liệu. Vui lòng kiểm tra shop-logic.js");
+                    throw new Error("db is undefined");
+                }
+
+                await db.collection("orders").add(orderData);
+
+                // Xóa giỏ hàng local & Cập nhật Header
+                localStorage.removeItem('tyt_cart');
+                if(typeof updateHeaderCartOnHome === 'function') updateHeaderCartOnHome();
+                
+                // Chuyển sang View Thành công
+                showView('view-success');
+
+            } catch (error) {
+                console.error("Lỗi đặt hàng: ", error);
+                alert("Rất tiếc! Đã có lỗi xảy ra khi tạo đơn hàng. Vui lòng thử lại hoặc liên hệ Hotline.");
+                btn.innerText = "XÁC NHẬN ĐẶT MUA";
+                btn.disabled = false;
+            }
+        }
+
+        // Khởi chạy khi load trang
+        document.addEventListener('DOMContentLoaded', loadCart);
+    </script>
+    <div id="floating-contact-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 15px;">
+        
+        <div id="contact-menu" style="display: none; background: #fff; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.18); overflow: hidden; width: 290px; flex-direction: column; border: 1px solid #eee; animation: fadeContactMenu 0.3s ease-out; transform-origin: bottom right;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 10px; border-bottom: 1px solid #f1f1f1;">
+                <h4 style="margin: 0; color: #105b4d; font-size: 15px; text-transform: uppercase;">Liên hệ với TYTBOOKS</h4>
+                <span onclick="toggleContactMenu()" style="cursor: pointer; font-size: 24px; color: #aaa; line-height: 1;">&times;</span>
+            </div>
+            
+            <a href="tel:0866643XXX" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; border-bottom: 1px solid #f9f9f9; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
+                <div class="contact-icon-circle" style="background: #e74c3c; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(231,76,60,0.3);">
+                    <svg class="svg-shake" style="width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24"><path d="M20 22.62a3.3 3.3 0 0 1-2.32-.97l-2.07-2.07a11.51 11.51 0 0 1-3.61-2 11.39 11.39 0 0 1-2-3.62l-2.06-2.06a3.29 3.29 0 0 1-.01-4.63L9.67 5.56a3.29 3.29 0 0 1 4.64 0l1.29 1.29a2 2 0 0 1 0 2.82l-1.06 1.06a1.5 1.5 0 0 0-.44 1.06 1.48 1.48 0 0 0 .44 1.06 6 6 0 0 0 4.24 4.24 1.48 1.48 0 0 0 1.06-.44l1.06-1.06a2 2 0 0 1 2.83 0l1.29 1.29a3.3 3.3 0 0 1 .01 4.63l-1.74 1.74a3.3 3.3 0 0 1-2.33.98z"/></svg>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: bold; color: #e74c3c; margin-bottom: 2px;">Hotline 24/7</div>
+                    <div style="font-size: 13px; color: #666;">Gọi ngay: 0866.643.XXX</div>
+                </div>
+            </a>
+            
+            <a href="https://zalo.me/0866643XXX" target="_blank" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; border-bottom: 1px solid #f9f9f9; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
+                <div class="contact-icon-circle" style="background: #0088cc; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(0,136,204,0.3);">
+                    <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.146 2 11.26c0 2.91 1.446 5.5 3.705 7.158V22l3.41-1.87a11.233 11.233 0 0 0 2.885.372c5.523 0 10-4.146 10-9.262S17.523 2 12 2zm1.611 11.916l-2.484-2.656-4.836 2.656 5.319-5.642 2.553 2.656 4.767-2.656-5.319 5.642z"/></svg>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: bold; color: #0088cc; margin-bottom: 2px;">Chat Zalo</div>
+                    <div style="font-size: 13px; color: #666;">Hỗ trợ khách hàng qua Zalo</div>
+                </div>
+            </a>
+            
+            <a href="#" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
+                <div class="contact-icon-circle" style="background: #1abc9c; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(26,188,156,0.3);">
+                    <svg style="width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-size: 14px; font-weight: bold; color: #1abc9c; margin-bottom: 2px;">Gửi Yêu Cầu</div>
+                    <div style="font-size: 13px; color: #666;">Đăng kí thông tin hoặc lời nhắn</div>
+                </div>
+            </a>
+        </div>
+
+        <div style="position: relative; width: 56px; height: 56px;">
+            <div style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; background: rgba(16, 91, 77, 0.3); border-radius: 50%; animation: pulseContact 2s infinite; z-index: 1;"></div>
+            
+            <button id="btn-toggle-contact" onclick="toggleContactMenu()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: #105b4d; color: white; border: none; box-shadow: 0 4px 10px rgba(16,91,77,0.4); cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s; outline: none; z-index: 2;">
+                <div id="contact-icons-wrap" style="position: relative; width: 28px; height: 28px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
+                    <svg class="contact-icon-active" style="width: 28px; height: 28px; fill: white; position: absolute; top: 0; left: 0; transition: 0.3s;" viewBox="0 0 24 24">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/>
+                    </svg>
+                    <svg class="contact-icon-close" style="width: 28px; height: 28px; fill: white; position: absolute; top: 0; left: 0; opacity: 0; transform: scale(0.5) rotate(-90deg); transition: 0.3s;" viewBox="0 0 24 24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
+                    </svg>
+                </div>
+            </button>
+        </div>
+    </div>
+
+    <style>
+        /* Animation lan tỏa vòng tròn */
+        @keyframes pulseContact { 
+            0% { transform: scale(0.85); opacity: 1; } 
+            100% { transform: scale(1.3); opacity: 0; } 
+        }
+        /* Animation hiện menu */
+        @keyframes fadeContactMenu { 
+            from { opacity: 0; transform: scale(0.8) translateY(20px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); } 
+        }
+        /* Animation rung chuông điện thoại */
+        .contact-icon-circle:hover .svg-shake { animation: phoneShake 0.5s infinite; }
+        @keyframes phoneShake { 
+            0% { transform: rotate(0); } 
+            25% { transform: rotate(15deg); } 
+            50% { transform: rotate(0); } 
+            75% { transform: rotate(-15deg); } 
+            100% { transform: rotate(0); } 
+        }
+    </style>
+    
+    <script>
+        function toggleContactMenu() {
+            const menu = document.getElementById('contact-menu');
+            const iconsWrap = document.getElementById('contact-icons-wrap');
+            const iconActive = iconsWrap.querySelector('.contact-icon-active');
+            const iconClose = iconsWrap.querySelector('.contact-icon-close');
+            
+            if (menu.style.display === 'none' || menu.style.display === '') {
+                // Hiển thị menu
+                menu.style.display = 'flex';
+                // Xoay 180 độ, làm mờ icon chat, phóng to icon X
+                iconsWrap.style.transform = 'rotate(180deg)';
+                iconActive.style.opacity = '0';
+                iconActive.style.transform = 'scale(0.5)';
+                iconClose.style.opacity = '1';
+                iconClose.style.transform = 'scale(1) rotate(90deg)';
+            } else {
+                // Ẩn menu
+                menu.style.display = 'none';
+                // Trả icon về như cũ
+                iconsWrap.style.transform = 'rotate(0deg)';
+                iconActive.style.opacity = '1';
+                iconActive.style.transform = 'scale(1)';
+                iconClose.style.opacity = '0';
+                iconClose.style.transform = 'scale(0.5) rotate(-90deg)';
+            }
+        }
+    </script>
 </body>
 </html>

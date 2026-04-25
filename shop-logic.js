@@ -56,7 +56,7 @@ window.onclick = function(event) {
 // PHẦN 2: LƯU SÁCH MỚI (ĐÃ BỌC LỚP BẢO VỆ CHỐNG CRASH)
 // -------------------------------------------------------------------
 const formAddBook = document.getElementById('addBookForm');
-if (formAddBook) { // <-- Lớp bảo vệ: Chỉ chạy khi tìm thấy form trên trang
+if (formAddBook) { 
     formAddBook.addEventListener('submit', async function(e) {
         e.preventDefault();
         const btnSubmit = document.getElementById('btnSubmitForm');
@@ -89,6 +89,9 @@ if (formAddBook) { // <-- Lớp bảo vệ: Chỉ chạy khi tìm thấy form tr
                 return;
             }
 
+            // Lấy mã sách (nếu không nhập thì để trống)
+            const bookCodeVal = document.getElementById('bookCode') ? document.getElementById('bookCode').value.trim() : '';
+
             await db.collection("books").add({
                 title: document.getElementById('bookTitle').value,
                 author: document.getElementById('bookAuthor').value,
@@ -97,6 +100,7 @@ if (formAddBook) { // <-- Lớp bảo vệ: Chỉ chạy khi tìm thấy form tr
                 price: Number(document.getElementById('bookPrice').value),
                 originalPrice: Number(document.getElementById('bookOriginalPrice').value),
                 publisher: document.getElementById('bookPublisher').value,
+                bookCode: bookCodeVal, // ĐÃ THÊM LƯU MÃ SÁCH VÀO DATABASE
                 pages: Number(document.getElementById('bookPages').value),
                 image: finalImageUrl, 
                 description: document.getElementById('bookDescription').value,
@@ -126,7 +130,6 @@ const urlParams = new URLSearchParams(window.location.search);
 let currentFilter = urlParams.get('category') || 'all'; 
 let currentKeyword = urlParams.get('search') ? urlParams.get('search').toLowerCase() : ''; 
 let currentPriceFilter = 'all'; 
-// BIẾN MỚI: Nhận diện xem người dùng có bấm từ nút "Xem tất cả Flash Sale" không
 let isFlashSaleView = urlParams.get('flashsale') === 'true'; 
 
 db.collection("books").orderBy("timestamp", "desc").onSnapshot((querySnapshot) => {
@@ -142,26 +145,22 @@ function renderBooks() {
     if (!mainSection) return;
     mainSection.innerHTML = ''; 
 
-    const isProductsPage = window.location.pathname.includes('products.html') || window.location.pathname.includes('danh-sach-san-pham.html');
+    const isProductsPage = window.location.pathname.includes('products') || window.location.pathname.includes('danh-sach-san-pham.html');
 
     let filteredBooks = window.allBooks;
 
-    // 1. LỌC FLASH SALE ƯU TIÊN
     if (isProductsPage && isFlashSaleView) {
         filteredBooks = filteredBooks.filter(book => book.flashSaleDiscount > 0);
     } else {
-        // Lọc danh mục bình thường
         if (currentFilter !== 'all') {
             filteredBooks = filteredBooks.filter(book => book.category === currentFilter);
         }
     }
 
-    // 2. Lọc theo từ khóa
     if (currentKeyword !== '') {
         filteredBooks = filteredBooks.filter(book => (book.title || "").toLowerCase().includes(currentKeyword));
     }
 
-    // 3. Lọc theo giá (Tính dựa trên GIÁ SAU KHI GIẢM nếu có Flash Sale)
     if (currentPriceFilter !== 'all') {
         filteredBooks = filteredBooks.filter(book => {
             const discount = book.flashSaleDiscount || 0;
@@ -181,7 +180,6 @@ function renderBooks() {
         return;
     }
 
-    // Gom nhóm sách
     let groupedBooks = {};
     if (isProductsPage) {
         let title = 'TẤT CẢ SẢN PHẨM';
@@ -218,27 +216,68 @@ function renderBooks() {
         let displayBooks = (!isProductsPage && currentFilter === 'all' && currentKeyword === '') ? books.slice(0, 8) : books;
 
         displayBooks.forEach((book) => {
-            // XỬ LÝ GIAO DIỆN NẾU SÁCH ĐƯỢC GIẢM GIÁ (Áp dụng cho mọi vị trí)
-            const discount = book.flashSaleDiscount || 0;
-            const finalPrice = book.price * (1 - discount / 100);
-            
-            const formatNewPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(finalPrice);
-            const formatOldPrice = discount > 0 ? new Intl.NumberFormat('vi-VN').format(book.price) + 'đ' : '';
-            const badgeHTML = discount > 0 ? `<div style="position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-weight: bold; font-size: 13px; padding: 4px 8px; border-radius: 4px; z-index: 2;">-${discount}%</div>` : '';
+            let finalPrice = book.price;
+            let oldPrice = book.originalPrice || '';
+            let discountPercent = 0;
+
+            if (book.flashSaleDiscount > 0) {
+                discountPercent = book.flashSaleDiscount;
+                finalPrice = book.price * (1 - discountPercent / 100);
+                oldPrice = book.price; 
+            } else if (book.originalPrice && book.originalPrice > book.price) {
+                discountPercent = Math.round((1 - book.price / book.originalPrice) * 100);
+            }
+
+            const formatNewPrice = new Intl.NumberFormat('vi-VN').format(finalPrice) + 'đ';
+            const formatOldPrice = oldPrice ? new Intl.NumberFormat('vi-VN').format(oldPrice) + 'đ' : '';
+            const badgeHTML = discountPercent > 0 ? `<div style="background: #e74c3c; color: white; font-weight: bold; font-size: 13px; padding: 4px 8px; border-radius: 4px;">-${discountPercent}%</div>` : '';
             const imageUrl = book.image ? book.image : 'https://via.placeholder.com/250x300?text=Chưa+có+ảnh';
+            const publisherName = book.publisher ? book.publisher.toUpperCase() : (book.category ? book.category.toUpperCase() : 'TYTBOOKS');
 
             groupHTML += `
-                <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'" style="background: #fff; border-radius: 8px; padding: 12px; position: relative; cursor: pointer; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
-                    ${badgeHTML}
+                <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'" style="background: #fff; border-radius: 8px; padding: 15px; position: relative; cursor: pointer; transition: transform 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; flex-direction: column; height: 100%;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                    
                     <div style="position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 10;">
                         <button class="btn-edit-item" style="display: none; background: #007bff; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.2); padding: 0; line-height: 32px;" onclick="event.stopPropagation(); openEditModal('${book.id}')" title="Sửa">✎</button>
                         <button class="btn-delete" style="display: none; background: #dc3545; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.2); padding: 0; line-height: 32px;" onclick="event.stopPropagation(); deleteBook('${book.id}')" title="Xóa">✕</button>
                     </div>
-                    <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 180px; object-fit: contain; margin-bottom: 12px;">
-                    <h3 class="product-name" style="font-size: 14px; height: 40px; overflow: hidden; margin-bottom: 5px; color: #333;">${book.title}</h3>
-                    <div style="display: flex; flex-direction: column;">
-                        <span class="new-price" style="color: #d0021b; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
-                        <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${formatOldPrice}</span>
+                    
+                    <div style="position: relative; width: 100%; height: 180px; margin-bottom: 15px; border-radius: 4px; overflow: hidden;"
+     onmouseover="this.querySelector('.qv-overlay').style.opacity='1'"
+     onmouseout="this.querySelector('.qv-overlay').style.opacity='0'">
+    <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: contain;">
+    
+    <div class="qv-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.4); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; z-index: 5;">
+        <div onclick="event.stopPropagation(); openQuickView('${book.id}')" style="background: #333; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.background='#105b4d';" onmouseout="this.style.transform='scale(1)'; this.style.background='#333';" title="Xem nhanh">
+            <svg style="width: 24px; height: 24px; fill: white;" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        </div>
+    </div>
+</div>
+                    <div style="font-size: 11px; color: #999; margin-bottom: 5px; font-weight: bold;">${publisherName}</div>
+                    <h3 class="product-name" style="font-size: 14px; height: 40px; overflow: hidden; margin-bottom: 10px; color: #333; line-height: 1.4;">${book.title}</h3>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; flex: 1;">
+                        <div style="display: flex; flex-direction: column;">
+                            <span class="new-price" style="color: #d0021b; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
+                            <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${formatOldPrice}</span>
+                        </div>
+                        ${badgeHTML}
+                    </div>
+
+                    <div style="display: flex; gap: 12px; align-items: center;" onclick="event.stopPropagation();">
+                        <button onclick="let qty = parseInt(document.getElementById('qty-${book.id}').innerText); alert('Đã thêm ' + qty + ' sản phẩm vào giỏ!'); if(typeof addToCart === 'function') { for(let i=0; i<qty; i++) { setTimeout(() => addToCart('${book.id}'), i*200); } }" style="background: #e74c3c; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(231,76,60,0.3);" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'" title="Thêm vào giỏ">
+                            
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;">
+                                <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/>
+                            </svg>
+
+                        </button>
+
+                        <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 20px; overflow: hidden; height: 32px; width: 95px; background: #fff;">
+                            <button onclick="let q=document.getElementById('qty-${book.id}'); if(parseInt(q.innerText)>1) q.innerText=parseInt(q.innerText)-1;" style="background: transparent; border: none; width: 30px; font-size: 18px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">-</button>
+                            <span id="qty-${book.id}" style="flex: 1; text-align: center; font-size: 13px; font-weight: bold; color: #333;">1</span>
+                            <button onclick="let q=document.getElementById('qty-${book.id}'); q.innerText=parseInt(q.innerText)+1;" style="background: transparent; border: none; width: 30px; font-size: 16px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">+</button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -254,7 +293,7 @@ function renderBooks() {
 // -------------------------------------------------------------------
 window.filterCategory = function(event, categoryName) {
     if(event) event.preventDefault(); 
-    const isProductsPage = window.location.pathname.includes('products.html') || window.location.pathname.includes('danh-sach-san-pham.html');
+    const isProductsPage = window.location.pathname.includes('products') || window.location.pathname.includes('danh-sach-san-pham.html');
     if (!isProductsPage) {
         window.location.href = `products.html?category=${encodeURIComponent(categoryName)}`;
         return;
@@ -273,7 +312,7 @@ window.executeSearch = function() {
     const searchInput = document.querySelector('.search-bar input');
     if (!searchInput) return;
     const keyword = searchInput.value.trim().toLowerCase();
-    const isProductsPage = window.location.pathname.includes('products.html') || window.location.pathname.includes('danh-sach-san-pham.html');
+    const isProductsPage = window.location.pathname.includes('products') || window.location.pathname.includes('danh-sach-san-pham.html');
     if (!isProductsPage) {
         window.location.href = `products.html?search=${encodeURIComponent(keyword)}`;
         return;
@@ -311,6 +350,17 @@ window.deleteBook = function(id) {
     }
 };
 
+// ==========================================
+// HÀM XỬ LÝ XÓA SÁCH & SỬA SÁCH 
+// ==========================================
+window.deleteBook = function(id) {
+    if (confirm("Bạn có chắc chắn muốn xóa cuốn sách này không? Hành động này không thể hoàn tác!")) {
+        db.collection("books").doc(id).delete()
+        .then(() => alert("Đã xóa sách khỏi hệ thống thành công!"))
+        .catch((error) => alert("Không thể xóa sách. Có thể do lỗi kết nối hoặc quyền hạn!"));
+    }
+};
+
 window.openEditModal = function(id) {
     db.collection("books").doc(id).get().then((doc) => {
         if (doc.exists) {
@@ -318,6 +368,13 @@ window.openEditModal = function(id) {
             document.getElementById('edit-book-id').value = id;
             document.getElementById('edit-book-title').value = book.title || "";
             document.getElementById('edit-book-author').value = book.author || "";
+            
+            // Các trường mới
+            document.getElementById('edit-book-code').value = book.bookCode || "";
+            document.getElementById('edit-book-publisher').value = book.publisher || "";
+            document.getElementById('edit-book-pages').value = book.pages || "";
+            document.getElementById('edit-book-originalPrice').value = book.originalPrice || "";
+            
             document.getElementById('edit-book-price').value = book.price || 0;
             document.getElementById('edit-book-category').value = book.category || "";
             document.getElementById('edit-book-status').value = book.status || "Còn hàng"; 
@@ -334,7 +391,7 @@ window.openEditModal = function(id) {
 
 window.updateBookInFirebase = async function() {
     const id = document.getElementById('edit-book-id').value;
-    const btnSave = document.querySelector('#editBookModal button');
+    const btnSave = document.getElementById('btnSaveEditBook');
     const oldText = btnSave.innerText;
     btnSave.innerText = "ĐANG LƯU..."; btnSave.disabled = true;
 
@@ -346,7 +403,7 @@ window.updateBookInFirebase = async function() {
             const formData = new FormData();
             formData.append("image", fileInput.files[0]);
 
-            const imgbbResponse = await fetch("https://api.imgbb.com/1/upload?key=DÁN_MÃ_API_CỦA_BẠN_VÀO_ĐÂY", {
+            const imgbbResponse = await fetch("https://api.imgbb.com/1/upload?key=d7b00b2423e2637f15f86e4a81c1147d", {
                 method: "POST",
                 body: formData
             });
@@ -362,6 +419,13 @@ window.updateBookInFirebase = async function() {
         const newData = {
             title: document.getElementById('edit-book-title').value,
             author: document.getElementById('edit-book-author').value,
+            
+            // Gửi các trường mới lên Firebase
+            bookCode: document.getElementById('edit-book-code').value,
+            publisher: document.getElementById('edit-book-publisher').value,
+            pages: Number(document.getElementById('edit-book-pages').value),
+            originalPrice: Number(document.getElementById('edit-book-originalPrice').value),
+            
             price: Number(document.getElementById('edit-book-price').value),
             category: document.getElementById('edit-book-category').value,
             status: document.getElementById('edit-book-status').value, 
@@ -933,6 +997,13 @@ window.renderFlashSaleFrontend = function() {
     const fsGrid = document.getElementById('flash-sale-grid');
     if(!fsSection || !fsGrid) return; // Nếu đang ở trang khác không có ô này thì bỏ qua
 
+    // ĐÂY LÀ ĐOẠN FIX: Nếu đang ở trang Danh sách (products) thì GIẤU CẢ KHỐI XANH ĐI
+    const isProductsPage = window.location.pathname.includes('products');
+    if (isProductsPage) {
+        fsSection.style.display = 'none';
+        return;
+    }
+
     const fsBooks = window.allBooks.filter(b => b.flashSaleDiscount > 0);
     
     if(fsBooks.length === 0) {
@@ -945,29 +1016,62 @@ window.renderFlashSaleFrontend = function() {
     
     // Chỉ lấy 5 cuốn hiện ra ngoài màn hình cho gọn đẹp
     fsBooks.slice(0, 5).forEach(book => {
-        const currentPrice = book.price * (1 - book.flashSaleDiscount / 100); // Công thức tính giá sau giảm
-        const formatOldPrice = new Intl.NumberFormat('vi-VN').format(book.price) + 'đ';
-        const formatNewPrice = new Intl.NumberFormat('vi-VN').format(currentPrice) + 'đ';
+        const discountPercent = book.flashSaleDiscount;
+        const finalPrice = book.price * (1 - discountPercent / 100);
+        const oldPrice = book.price;
+
+        const formatNewPrice = new Intl.NumberFormat('vi-VN').format(finalPrice) + 'đ';
+        const formatOldPrice = new Intl.NumberFormat('vi-VN').format(oldPrice) + 'đ';
+        const badgeHTML = `<div style="background: #e74c3c; color: white; font-weight: bold; font-size: 13px; padding: 4px 8px; border-radius: 4px;">-${discountPercent}%</div>`;
         const imageUrl = book.image ? book.image : 'https://via.placeholder.com/250x300?text=Chưa+có+ảnh';
+        const publisherName = book.publisher ? book.publisher.toUpperCase() : (book.category ? book.category.toUpperCase() : 'TYTBOOKS');
 
         html += `
-            <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'" style="background: #fff; border-radius: 8px; padding: 12px; position: relative; cursor: pointer; transition: transform 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'" style="background: #fff; border-radius: 8px; padding: 15px; position: relative; cursor: pointer; transition: transform 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; flex-direction: column; height: 100%;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                 
-                <div style="position: absolute; top: 10px; right: 10px; background: #e74c3c; color: white; font-weight: bold; font-size: 13px; padding: 4px 8px; border-radius: 4px; z-index: 2;">-${book.flashSaleDiscount}%</div>
+                <div style="position: relative; width: 100%; height: 180px; margin-bottom: 15px; border-radius: 4px; overflow: hidden;"
+     onmouseover="this.querySelector('.qv-overlay').style.opacity='1'"
+     onmouseout="this.querySelector('.qv-overlay').style.opacity='0'">
+    <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: contain;">
+    
+    <div class="qv-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.4); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; z-index: 5;">
+        <div onclick="event.stopPropagation(); openQuickView('${book.id}')" style="background: #333; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.background='#105b4d';" onmouseout="this.style.transform='scale(1)'; this.style.background='#333';" title="Xem nhanh">
+            <svg style="width: 24px; height: 24px; fill: white;" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+        </div>
+    </div>
+</div>
+                <div style="font-size: 11px; color: #999; margin-bottom: 5px; font-weight: bold;">${publisherName}</div>
+                <h3 style="font-size: 14px; height: 40px; overflow: hidden; margin-bottom: 10px; color: #333; line-height: 1.4;">${book.title}</h3>
                 
-                <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 160px; object-fit: contain; margin-bottom: 12px;">
-                <h3 style="font-size: 13px; height: 36px; overflow: hidden; margin-bottom: 8px; color: #333; line-height: 1.4;">${book.title}</h3>
-                
-                <div style="display: flex; flex-direction: column;">
-                    <span style="color: #e74c3c; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
-                    <span style="color: #999; text-decoration: line-through; font-size: 12px;">${formatOldPrice}</span>
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; flex: 1;">
+                    <div style="display: flex; flex-direction: column;">
+                        <span class="new-price" style="color: #d0021b; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
+                        <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${formatOldPrice}</span>
+                    </div>
+                    ${badgeHTML}
                 </div>
+
+                <div style="display: flex; gap: 12px; align-items: center;" onclick="event.stopPropagation();">
+                    <button onclick="let qty = parseInt(document.getElementById('qty-${book.id}').innerText); alert('Đã thêm ' + qty + ' sản phẩm vào giỏ!'); if(typeof addToCart === 'function') { for(let i=0; i<qty; i++) { setTimeout(() => addToCart('${book.id}'), i*200); } }" style="background: #e74c3c; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(231,76,60,0.3);" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'" title="Thêm vào giỏ">
+                        
+                        <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;">
+                            <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/>
+                        </svg>
+
+                    </button>
+
+                    <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 20px; overflow: hidden; height: 32px; width: 95px; background: #fff;">
+                        <button onclick="let q=document.getElementById('qty-${book.id}'); if(parseInt(q.innerText)>1) q.innerText=parseInt(q.innerText)-1;" style="background: transparent; border: none; width: 30px; font-size: 18px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">-</button>
+                        <span id="qty-${book.id}" style="flex: 1; text-align: center; font-size: 13px; font-weight: bold; color: #333;">1</span>
+                        <button onclick="let q=document.getElementById('qty-${book.id}'); q.innerText=parseInt(q.innerText)+1;" style="background: transparent; border: none; width: 30px; font-size: 16px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">+</button>
+                    </div>
+                </div>
+
             </div>
         `;
     });
     fsGrid.innerHTML = html;
 };
-
 // MẸO NHỎ MÀ CÓ VÕ LÀ ĐÂY:
 // Khi Firebase báo có dữ liệu sách mới tải về (ở dòng 102), chúng ta yêu cầu nó chạy luôn hàm renderFlashSaleFrontend!
 const originalRenderBooks = window.renderBooks;
@@ -975,3 +1079,88 @@ window.renderBooks = function() {
     originalRenderBooks(); 
     renderFlashSaleFrontend(); // Tự động load Flash sale liên tục
 };
+// ==========================================
+// XỬ LÝ: XEM NHANH SẢN PHẨM (QUICK VIEW)
+// ==========================================
+window.openQuickView = async function(bookId) {
+    try {
+        const doc = await db.collection("books").doc(bookId).get();
+        if (doc.exists) {
+            const book = doc.data();
+            
+            document.getElementById('qv-title').innerText = book.title;
+            document.getElementById('qv-publisher').innerText = book.publisher || "TYTBOOKS";
+            document.getElementById('qv-status').innerText = book.status || "Còn hàng";
+            document.getElementById('qv-image').src = book.image || "https://via.placeholder.com/250";
+            document.getElementById('qv-detail-link').href = 'detail.html?id=' + bookId;
+            
+            let finalPrice = book.price;
+            let oldPrice = book.originalPrice || 0;
+            let discountPercent = 0;
+
+            if (book.flashSaleDiscount > 0) {
+                discountPercent = book.flashSaleDiscount;
+                finalPrice = book.price * (1 - discountPercent / 100);
+                oldPrice = book.price; 
+            } else if (oldPrice > finalPrice && finalPrice > 0) {
+                discountPercent = Math.round((1 - finalPrice / oldPrice) * 100);
+            }
+
+            document.getElementById('qv-new-price').innerText = new Intl.NumberFormat('vi-VN').format(finalPrice) + 'đ';
+            
+            if (oldPrice > finalPrice) {
+                document.getElementById('qv-old-price').innerText = new Intl.NumberFormat('vi-VN').format(oldPrice) + 'đ';
+                document.getElementById('qv-discount-inline').innerText = `-${discountPercent}%`;
+                document.getElementById('qv-discount-inline').style.display = 'inline-block';
+                
+                document.getElementById('qv-discount-text').innerText = `-${discountPercent}%`;
+                document.getElementById('qv-discount-badge').style.display = 'flex';
+            } else {
+                document.getElementById('qv-old-price').innerText = '';
+                document.getElementById('qv-discount-inline').style.display = 'none';
+                document.getElementById('qv-discount-badge').style.display = 'none';
+            }
+
+            document.getElementById('qv-qty').innerText = "1"; // Reset số lượng
+            
+            // Lưu dữ liệu tạm để thêm vào giỏ
+            window.currentQuickViewBook = {
+                id: bookId,
+                title: book.title,
+                price: finalPrice,
+                image: book.image || "https://via.placeholder.com/100"
+            };
+
+            // Hiển thị modal
+            document.getElementById('quickViewModal').style.display = 'flex';
+        }
+    } catch (error) {
+        console.error("Lỗi xem nhanh:", error);
+    }
+};
+
+window.addToCartQuickView = function() {
+    if(!window.currentQuickViewBook) return;
+    const qty = parseInt(document.getElementById('qv-qty').innerText) || 1;
+    
+    let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+    let existingItem = cart.find(item => item.id === window.currentQuickViewBook.id);
+    
+    if (existingItem) {
+        existingItem.quantity += qty;
+    } else {
+        cart.push({
+            id: window.currentQuickViewBook.id,
+            title: window.currentQuickViewBook.title,
+            price: window.currentQuickViewBook.price,
+            image: window.currentQuickViewBook.image,
+            quantity: qty
+        });
+    }
+    localStorage.setItem('tyt_cart', JSON.stringify(cart));
+    
+    if(typeof updateHeaderCartOnHome === 'function') updateHeaderCartOnHome();
+    
+    alert(`Đã thêm ${qty} cuốn '${window.currentQuickViewBook.title}' vào giỏ hàng!`);
+    document.getElementById('quickViewModal').style.display = 'none';
+}
