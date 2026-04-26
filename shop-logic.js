@@ -70,7 +70,7 @@ if (formAddBook) {
                 const formData = new FormData();
                 formData.append("image", fileInput.files[0]);
 
-                const imgbbResponse = await fetch("https://api.imgbb.com/1/upload?key=DÁN_MÃ_API_CỦA_BẠN_VÀO_ĐÂY", {
+                const imgbbResponse = await fetch("https://api.imgbb.com/1/upload?key=d7b00b2423e2637f15f86e4a81c1147d", {
                     method: "POST",
                     body: formData
                 });
@@ -234,51 +234,77 @@ function renderBooks() {
             const imageUrl = book.image ? book.image : 'https://via.placeholder.com/250x300?text=Chưa+có+ảnh';
             const publisherName = book.publisher ? book.publisher.toUpperCase() : (book.category ? book.category.toUpperCase() : 'TYTBOOKS');
 
+            // ==========================================
+            // LÔ GIC HẾT HÀNG VÀ SẮP VỀ TẠI TRANG CHỦ
+            // ==========================================
+            const isOutOfStock = book.status === "Hết hàng";
+            const isComingSoon = book.status === "Sắp về";
+            const isUnavailable = isOutOfStock || isComingSoon;
+
+            // Xử lý nhãn dán góc trái ảnh
+            let statusOverlay = '';
+            if (isOutOfStock) {
+                statusOverlay = `<div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; font-weight: bold; font-size: 11px; padding: 4px 8px; border-radius: 4px; z-index: 15;">HẾT HÀNG</div>`;
+            } else if (isComingSoon) {
+                statusOverlay = `<div style="position: absolute; top: 10px; left: 10px; background: #f39c12; color: white; font-weight: bold; font-size: 11px; padding: 4px 8px; border-radius: 4px; z-index: 15;">SẮP VỀ</div>`;
+            }
+            
+            // Xử lý khu vực nút "Thêm vào giỏ"
+            let cartActionHTML = '';
+            if (isOutOfStock) {
+                cartActionHTML = `<div style="width: 100%;"><button disabled style="width: 100%; background: #e0e0e0; color: #888; border: none; height: 35px; border-radius: 20px; font-weight: bold; cursor: not-allowed; font-size: 13px;">HẾT HÀNG</button></div>`;
+            } else if (isComingSoon) {
+                cartActionHTML = `<div style="width: 100%;"><button disabled style="width: 100%; background: #fdf0d5; color: #f39c12; border: 1px solid #f39c12; height: 35px; border-radius: 20px; font-weight: bold; cursor: not-allowed; font-size: 13px;">SẮP VỀ</button></div>`;
+            } else {
+                cartActionHTML = `
+                    <div style="display: flex; gap: 12px; align-items: center;" onclick="event.stopPropagation();">
+                        <button onclick="addToCartFromCard('${book.id}')" style="background: #e74c3c; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(231,76,60,0.3); outline: none;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'" title="Thêm vào giỏ">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;"><path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/></svg>
+                        </button>
+                        <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 20px; overflow: hidden; height: 32px; width: 95px; background: #fff;">
+                            <button onclick="let q=document.getElementById('qty-${book.id}'); if(parseInt(q.innerText)>1) q.innerText=parseInt(q.innerText)-1;" style="background: transparent; border: none; width: 30px; font-size: 18px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1; outline: none;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">-</button>
+                            <span id="qty-${book.id}" style="flex: 1; text-align: center; font-size: 13px; font-weight: bold; color: #333;">1</span>
+                            <button onclick="let q=document.getElementById('qty-${book.id}'); q.innerText=parseInt(q.innerText)+1;" style="background: transparent; border: none; width: 30px; font-size: 16px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1; outline: none;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Chọn cách hiển thị giá
+            let displayedNewPrice = formatNewPrice;
+            if (isOutOfStock) displayedNewPrice = 'HẾT HÀNG';
+
             groupHTML += `
                 <div class="product-card" onclick="window.location.href='detail.html?id=${book.id}'" style="background: #fff; border-radius: 8px; padding: 15px; position: relative; cursor: pointer; transition: transform 0.3s; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: flex; flex-direction: column; height: 100%;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
                     
-                    <div style="position: absolute; top: 10px; left: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 10;">
+                    <div style="position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 10;">
                         <button class="btn-edit-item" style="display: none; background: #007bff; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.2); padding: 0; line-height: 32px;" onclick="event.stopPropagation(); openEditModal('${book.id}')" title="Sửa">✎</button>
                         <button class="btn-delete" style="display: none; background: #dc3545; color: white; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer; box-shadow: 0 3px 6px rgba(0,0,0,0.2); padding: 0; line-height: 32px;" onclick="event.stopPropagation(); deleteBook('${book.id}')" title="Xóa">✕</button>
                     </div>
                     
-                    <div style="position: relative; width: 100%; height: 180px; margin-bottom: 15px; border-radius: 4px; overflow: hidden;"
-     onmouseover="this.querySelector('.qv-overlay').style.opacity='1'"
-     onmouseout="this.querySelector('.qv-overlay').style.opacity='0'">
-    <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: contain;">
-    
-    <div class="qv-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.4); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; z-index: 5;">
-        <div onclick="event.stopPropagation(); openQuickView('${book.id}')" style="background: #333; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.background='#105b4d';" onmouseout="this.style.transform='scale(1)'; this.style.background='#333';" title="Xem nhanh">
-            <svg style="width: 24px; height: 24px; fill: white;" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-        </div>
-    </div>
-</div>
+                    <div style="position: relative; width: 100%; height: 180px; margin-bottom: 15px; border-radius: 4px; overflow: hidden;" onmouseover="this.querySelector('.qv-overlay').style.opacity='1'" onmouseout="this.querySelector('.qv-overlay').style.opacity='0'">
+                        ${statusOverlay}
+                        <img src="${imageUrl}" alt="${book.title}" style="width: 100%; height: 100%; object-fit: contain; ${isUnavailable ? 'opacity: 0.6;' : ''}">
+                        
+                        <div class="qv-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.4); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s; z-index: 5;">
+                            <div onclick="event.stopPropagation(); openQuickView('${book.id}')" style="background: #333; color: white; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s;" onmouseover="this.style.transform='scale(1.1)'; this.style.background='#105b4d';" onmouseout="this.style.transform='scale(1)'; this.style.background='#333';" title="Xem nhanh">
+                                <svg style="width: 24px; height: 24px; fill: white;" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div style="font-size: 11px; color: #999; margin-bottom: 5px; font-weight: bold;">${publisherName}</div>
                     <h3 class="product-name" style="font-size: 14px; height: 40px; overflow: hidden; margin-bottom: 10px; color: #333; line-height: 1.4;">${book.title}</h3>
                     
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; flex: 1;">
                         <div style="display: flex; flex-direction: column;">
-                            <span class="new-price" style="color: #d0021b; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
-                            <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${formatOldPrice}</span>
+                            <span class="new-price" style="color: ${isOutOfStock ? '#999' : '#d0021b'}; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${displayedNewPrice}</span>
+                            <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${isUnavailable ? '' : formatOldPrice}</span>
                         </div>
-                        ${badgeHTML}
+                        ${isUnavailable ? '' : badgeHTML}
                     </div>
 
-                    <div style="display: flex; gap: 12px; align-items: center;" onclick="event.stopPropagation();">
-                        <button onclick="let qty = parseInt(document.getElementById('qty-${book.id}').innerText); alert('Đã thêm ' + qty + ' sản phẩm vào giỏ!'); if(typeof addToCart === 'function') { for(let i=0; i<qty; i++) { setTimeout(() => addToCart('${book.id}'), i*200); } }" style="background: #e74c3c; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(231,76,60,0.3);" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'" title="Thêm vào giỏ">
-                            
-                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;">
-                                <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/>
-                            </svg>
-
-                        </button>
-
-                        <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 20px; overflow: hidden; height: 32px; width: 95px; background: #fff;">
-                            <button onclick="let q=document.getElementById('qty-${book.id}'); if(parseInt(q.innerText)>1) q.innerText=parseInt(q.innerText)-1;" style="background: transparent; border: none; width: 30px; font-size: 18px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">-</button>
-                            <span id="qty-${book.id}" style="flex: 1; text-align: center; font-size: 13px; font-weight: bold; color: #333;">1</span>
-                            <button onclick="let q=document.getElementById('qty-${book.id}'); q.innerText=parseInt(q.innerText)+1;" style="background: transparent; border: none; width: 30px; font-size: 16px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">+</button>
-                        </div>
-                    </div>
+                    ${cartActionHTML}
                 </div>
             `;
         });
@@ -728,7 +754,7 @@ window.saveBannersToFirebase = async function() {
     }
 
     const bannerData = {};
-    const imgbbApiKey = "DÁN_MÃ_API_CỦA_BẠN_VÀO_ĐÂY"; 
+    const imgbbApiKey = "d7b00b2423e2637f15f86e4a81c1147d"; 
 
     try {
         for (let i = 1; i <= 10; i++) {
@@ -1044,30 +1070,27 @@ window.renderFlashSaleFrontend = function() {
                 <h3 style="font-size: 14px; height: 40px; overflow: hidden; margin-bottom: 10px; color: #333; line-height: 1.4;">${book.title}</h3>
                 
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 15px; flex: 1;">
-                    <div style="display: flex; flex-direction: column;">
-                        <span class="new-price" style="color: #d0021b; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
-                        <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${formatOldPrice}</span>
+                        <div style="display: flex; flex-direction: column;">
+                            <span style="color: #d0021b; font-weight: bold; font-size: 16px; margin-bottom: 3px;">${formatNewPrice}</span>
+                            <span style="color: #999; text-decoration: line-through; font-size: 12px; min-height: 15px;">${formatOldPrice}</span>
+                        </div>
+                        ${badgeHTML}
                     </div>
-                    ${badgeHTML}
-                </div>
 
-                <div style="display: flex; gap: 12px; align-items: center;" onclick="event.stopPropagation();">
-                    <button onclick="let qty = parseInt(document.getElementById('qty-${book.id}').innerText); alert('Đã thêm ' + qty + ' sản phẩm vào giỏ!'); if(typeof addToCart === 'function') { for(let i=0; i<qty; i++) { setTimeout(() => addToCart('${book.id}'), i*200); } }" style="background: #e74c3c; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(231,76,60,0.3);" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'" title="Thêm vào giỏ">
-                        
-                        <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;">
-                            <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/>
-                        </svg>
+                    <div style="display: flex; gap: 12px; align-items: center;" onclick="event.stopPropagation();">
+                        <button onclick="addToCartFromCard('${book.id}')" style="background: #e74c3c; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(231,76,60,0.3); outline: none;" onmouseover="this.style.background='#c0392b'" onmouseout="this.style.background='#e74c3c'" title="Thêm vào giỏ">
+                            <svg viewBox="0 0 24 24" style="width: 18px; height: 18px; fill: white;">
+                                <path d="M19 6h-2c0-2.76-2.24-5-5-5S7 3.24 7 6H5c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-7-3c1.66 0 3 1.34 3 3H9c0-1.66 1.34-3 3-3zm7 17H5V8h14v12zm-7-8c-1.66 0-3-1.34-3-3H7c0 2.76 2.24 5 5 5s5-2.24 5-5h-2c0 1.66-1.34 3-3 3z"/>
+                            </svg>
+                        </button>
 
-                    </button>
-
-                    <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 20px; overflow: hidden; height: 32px; width: 95px; background: #fff;">
-                        <button onclick="let q=document.getElementById('qty-${book.id}'); if(parseInt(q.innerText)>1) q.innerText=parseInt(q.innerText)-1;" style="background: transparent; border: none; width: 30px; font-size: 18px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">-</button>
-                        <span id="qty-${book.id}" style="flex: 1; text-align: center; font-size: 13px; font-weight: bold; color: #333;">1</span>
-                        <button onclick="let q=document.getElementById('qty-${book.id}'); q.innerText=parseInt(q.innerText)+1;" style="background: transparent; border: none; width: 30px; font-size: 16px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">+</button>
+                        <div style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 20px; overflow: hidden; height: 32px; width: 95px; background: #fff;">
+                            <button onclick="let q=document.getElementById('qty-${book.id}'); if(parseInt(q.innerText)>1) q.innerText=parseInt(q.innerText)-1;" style="background: transparent; border: none; width: 30px; font-size: 18px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1; outline: none;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">-</button>
+                            <span id="qty-${book.id}" style="flex: 1; text-align: center; font-size: 13px; font-weight: bold; color: #333;">1</span>
+                            <button onclick="let q=document.getElementById('qty-${book.id}'); q.innerText=parseInt(q.innerText)+1;" style="background: transparent; border: none; width: 30px; font-size: 16px; color: #888; cursor: pointer; transition: 0.2s; padding: 0; line-height: 1; outline: none;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">+</button>
+                        </div>
                     </div>
                 </div>
-
-            </div>
         `;
     });
     fsGrid.innerHTML = html;
@@ -1164,3 +1187,230 @@ window.addToCartQuickView = function() {
     alert(`Đã thêm ${qty} cuốn '${window.currentQuickViewBook.title}' vào giỏ hàng!`);
     document.getElementById('quickViewModal').style.display = 'none';
 }
+// ==========================================
+// XỬ LÝ THÊM VÀO GIỎ HÀNG TỪ TRANG CHỦ / DANH SÁCH
+// ==========================================
+window.addToCartFromCard = function(bookId) {
+    // 1. Tìm thông tin sách vừa bấm
+    const book = window.allBooks.find(b => b.id === bookId);
+    if(!book) return;
+
+    // 2. Lấy số lượng khách vừa bấm (+ / -)
+    const qtyStr = document.getElementById('qty-' + bookId).innerText;
+    const qty = parseInt(qtyStr) || 1;
+
+    // 3. Tính toán giá và đẩy vào Giỏ hàng
+    let cart = JSON.parse(localStorage.getItem('tyt_cart')) || [];
+    let existingItem = cart.find(item => item.id === bookId);
+
+    let finalPrice = Number(book.price) || 0;
+    let discountPercent = Number(book.flashSaleDiscount) || 0;
+    if(discountPercent > 0) {
+        finalPrice = finalPrice * (1 - discountPercent / 100);
+    }
+
+    if (existingItem) {
+        existingItem.quantity += qty;
+    } else {
+        cart.push({
+            id: bookId,
+            title: book.title,
+            price: finalPrice,
+            image: book.image || "https://via.placeholder.com/100",
+            quantity: qty
+        });
+    }
+    localStorage.setItem('tyt_cart', JSON.stringify(cart));
+
+    // Cập nhật số trên icon giỏ hàng header
+    if(typeof updateHeaderCartOnHome === 'function') updateHeaderCartOnHome();
+
+    // 4. Mở Bảng Thông báo (Modal)
+    const modal = document.getElementById('cartSuccessModal');
+    if(modal) {
+        document.getElementById('modal-success-text').innerText = qty + " sản phẩm vừa được thêm vào giỏ hàng";
+        document.getElementById('modal-book-img').src = book.image || "https://via.placeholder.com/100";
+        document.getElementById('modal-book-title').innerText = book.title;
+        document.getElementById('modal-book-author').innerText = book.author || "Đang cập nhật";
+        document.getElementById('modal-book-publisher').innerText = book.publisher || "TYTBOOKS";
+
+        document.getElementById('modal-book-price').innerText = new Intl.NumberFormat('vi-VN').format(finalPrice) + 'đ';
+
+        let oldPrice = Number(book.originalPrice) || 0;
+        if(discountPercent > 0) oldPrice = book.price;
+
+        if(oldPrice > finalPrice) {
+            document.getElementById('modal-book-old-price').innerText = new Intl.NumberFormat('vi-VN').format(oldPrice) + 'đ';
+            let calcDiscount = discountPercent > 0 ? discountPercent : Math.round((1 - finalPrice/oldPrice)*100);
+            document.getElementById('modal-book-discount').innerText = "Giảm giá " + calcDiscount + "%";
+        } else {
+            document.getElementById('modal-book-old-price').innerText = "";
+            document.getElementById('modal-book-discount').innerText = "";
+        }
+
+        let cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        let totalItemsInCart = cart.reduce((sum, item) => sum + item.quantity, 0);
+        let formattedTotal = new Intl.NumberFormat('vi-VN').format(cartTotal) + 'đ';
+
+        document.getElementById('modal-cart-count').innerText = "(" + totalItemsInCart + " sản phẩm)";
+        document.getElementById('modal-cart-subtotal').innerText = formattedTotal;
+        document.getElementById('modal-cart-total').innerText = formattedTotal;
+
+        modal.style.display = 'block';
+    } else {
+        // Backup an toàn nếu bạn lỡ quên chèn HTML ở Bước 1
+        alert(`Đã thêm ${qty} cuốn "${book.title}" vào giỏ hàng!`);
+    }
+};
+// ==========================================
+// XỬ LÝ ĐĂNG SÁCH MỚI (CHỐNG TẢI LẠI TRANG)
+// ==========================================
+window.submitNewBookForm = async function(e) {
+    // 1. Dòng này cực kỳ quan trọng: CHẶN TRÌNH DUYỆT TẢI LẠI TRANG!
+    e.preventDefault(); 
+    
+    const btnSubmit = document.getElementById('btnSubmitForm');
+    const originalText = btnSubmit.innerText;
+    btnSubmit.innerText = "ĐANG TẢI LÊN...";
+    btnSubmit.disabled = true;
+
+    try {
+        let finalImageUrl = document.getElementById('bookImage').value.trim();
+        const fileInput = document.getElementById('bookImageFile');
+
+        // 2. Nếu có chọn ảnh từ máy tính thì đẩy lên ImgBB trước
+        if (fileInput && fileInput.files.length > 0) {
+            const formData = new FormData();
+            formData.append("image", fileInput.files[0]);
+
+            // LƯU Ý: Nhớ thay chữ DÁN_MÃ_API_CỦA_BẠN_VÀO_ĐÂY bằng mã thật của bạn nhé
+            const imgbbResponse = await fetch("https://api.imgbb.com/1/upload?key=d7b00b2423e2637f15f86e4a81c1147d", {
+                method: "POST",
+                body: formData
+            });
+            
+            const imgbbData = await imgbbResponse.json();
+            if (imgbbData.success) {
+                finalImageUrl = imgbbData.data.url; 
+            } else {
+                throw new Error("Lỗi khi tải ảnh lên máy chủ ImgBB!");
+            }
+        }
+
+        // Bắt lỗi quên nhập ảnh
+        if (!finalImageUrl) {
+            alert("❌ Vui lòng chọn ảnh bìa từ máy tính hoặc dán link URL ảnh!");
+            btnSubmit.innerText = originalText; 
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        const bookCodeVal = document.getElementById('bookCode') ? document.getElementById('bookCode').value.trim() : '';
+
+        // 3. Đẩy dữ liệu lên Firebase
+        await db.collection("books").add({
+            title: document.getElementById('bookTitle').value,
+            author: document.getElementById('bookAuthor').value,
+            category: document.getElementById('bookCategory').value, 
+            status: document.getElementById('book-status').value, 
+            price: Number(document.getElementById('bookPrice').value),
+            originalPrice: Number(document.getElementById('bookOriginalPrice').value),
+            publisher: document.getElementById('bookPublisher').value,
+            bookCode: bookCodeVal,
+            pages: Number(document.getElementById('bookPages').value),
+            image: finalImageUrl, 
+            description: document.getElementById('bookDescription').value,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+        });
+
+        // 4. Thành công -> Báo cáo, xóa trắng form và đóng bảng
+        alert("✅ Tuyệt vời! Bạn đã đăng sách mới thành công lên hệ thống.");
+        document.getElementById('addBookForm').reset(); 
+        if(fileInput) fileInput.value = ""; 
+        document.getElementById('addBookModal').style.display = "none";
+        
+    } catch (error) {
+        console.error("Lỗi đăng sách: ", error);
+        alert("❌ Có lỗi xảy ra: " + error.message);
+    } finally {
+        // Trả lại nút bấm như cũ
+        btnSubmit.innerText = originalText; 
+        btnSubmit.disabled = false;
+    }
+}
+// ==========================================
+// TÍNH NĂNG: LỌC SÁCH ĐỒNG BỘ THÔNG MINH (NHÀ PHÁT HÀNH & DANH MỤC)
+// ==========================================
+document.addEventListener("DOMContentLoaded", () => {
+    // Vòng lặp chờ dữ liệu Firebase tải xong hoàn toàn
+    const checkDataInterval = setInterval(() => {
+        if (window.allBooks && window.allBooks.length > 0) {
+            clearInterval(checkDataInterval); 
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const publisherParam = urlParams.get('publisher');
+            const categoryParam = urlParams.get('category');
+            const searchParam = urlParams.get('search'); // Hỗ trợ luôn thanh tìm kiếm
+            
+            // NẾU KHÁCH CÓ BẤM VÀO MENU HOẶC TÌM KIẾM
+            if (publisherParam || categoryParam || searchParam) {
+                
+                // LỌC THÔNG MINH (SMART MATCH)
+                if (publisherParam) {
+                    // Cắt bỏ các chữ thừa như "NXB", "NHÀ XUẤT BẢN" để lấy từ khóa lõi (Vd: "NXB Hà Nội" -> "HÀ NỘI")
+                    let searchCore = publisherParam.toUpperCase().replace('NXB ', '').replace('NHÀ XUẤT BẢN ', '').trim();
+                    
+                    window.allBooks = window.allBooks.filter(book => {
+                        if(!book.publisher) return false;
+                        let dbPub = book.publisher.toUpperCase().replace('NXB ', '').replace('NHÀ XUẤT BẢN ', '').trim();
+                        // Chỉ cần chứa từ khóa lõi là cho qua
+                        return dbPub.includes(searchCore) || searchCore.includes(dbPub);
+                    });
+                } 
+                else if (categoryParam) {
+                    let searchCat = categoryParam.toUpperCase().trim();
+                    window.allBooks = window.allBooks.filter(book => {
+                        if(!book.category) return false;
+                        return book.category.toUpperCase().includes(searchCat) || searchCat.includes(book.category.toUpperCase());
+                    });
+                }
+                else if (searchParam) {
+                    let keyword = searchParam.toLowerCase().trim();
+                    window.allBooks = window.allBooks.filter(book => 
+                        book.title.toLowerCase().includes(keyword) || 
+                        (book.author && book.author.toLowerCase().includes(keyword))
+                    );
+                }
+                
+                // Gọi lại hàm vẽ sách. Lúc này kho sách chỉ còn đúng mục đã lọc!
+                if (typeof renderBooks === 'function') {
+                    renderBooks(); 
+                }
+                
+                // Đổi tiêu đề và báo lỗi nếu kho sách mục này bị trống
+                setTimeout(() => {
+                    const titleEl = document.querySelector('.section-title h2') || document.querySelector('h2') || document.querySelector('h3');
+                    if (titleEl) {
+                        if (publisherParam) titleEl.innerText = "SÁCH CỦA NXB: " + publisherParam.toUpperCase();
+                        if (categoryParam) titleEl.innerText = "THỂ LOẠI: " + categoryParam.toUpperCase();
+                        if (searchParam) titleEl.innerText = "KẾT QUẢ TÌM KIẾM: '" + searchParam + "'";
+                    }
+                    
+                    // Nếu lọc xong mà không có cuốn nào
+                    if (window.allBooks.length === 0) {
+                        const grid = document.getElementById('book-grid');
+                        if(grid) {
+                            grid.innerHTML = `
+                                <div style="grid-column: span 4; text-align: center; padding: 60px 0; background: #fff; border-radius: 8px; border: 1px dashed #ccc;">
+                                    <div style="font-size: 50px; margin-bottom: 15px;">📂</div>
+                                    <h3 style="color: #e74c3c; margin-bottom: 5px;">Rất tiếc!</h3>
+                                    <p style="color: #666; font-size: 15px;">Hiện tại hệ thống chưa có sản phẩm nào phù hợp.</p>
+                                </div>
+                            `;
+                        }
+                    }
+                }, 100);
+            }
+        }
+    }, 100); // Tốc độ quét 0.1 giây để bắt kịp Firebase
+});
