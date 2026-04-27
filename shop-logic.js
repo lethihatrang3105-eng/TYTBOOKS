@@ -1414,3 +1414,124 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, 100); // Tốc độ quét 0.1 giây để bắt kịp Firebase
 });
+// ==========================================
+// TÍNH NĂNG: QUẢN LÝ THÀNH VIÊN / KHÁCH HÀNG
+// ==========================================
+window.openMemberManager = async function() {
+    document.getElementById('memberManagerModal').style.display = 'block';
+    const listContainer = document.getElementById('admin-members-list');
+    listContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666; font-weight: bold;">⏳ Đang tải dữ liệu từ máy chủ...</div>';
+
+    try {
+        let members = [];
+        
+        // 1. Thử quét trong bảng 'users' (Nếu hệ thống đăng ký của bạn có lưu vào đây)
+        const usersSnapshot = await db.collection("users").get();
+        if (!usersSnapshot.empty) {
+            usersSnapshot.forEach(doc => {
+                let data = doc.data();
+                members.push({
+                    name: data.name || data.displayName || "Chưa cập nhật",
+                    email: data.email || "Không có email",
+                    date: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString('vi-VN') : "N/A") : "Mới đây"
+                });
+            });
+        } 
+        // 2. Kế hoạch B: Nếu chưa có bảng 'users', tự động quét lịch sử Đơn Hàng để lọc ra khách hàng
+        else {
+            const ordersSnapshot = await db.collection("orders").get();
+            let emailSet = new Set(); // Dùng Set để loại bỏ các email trùng lặp (1 khách mua nhiều lần)
+            
+            ordersSnapshot.forEach(doc => {
+                let data = doc.data();
+                // Chỉ lấy những đơn có email và chưa từng thêm vào danh sách
+                if(data.customerEmail && !emailSet.has(data.customerEmail)) {
+                    emailSet.add(data.customerEmail);
+                    members.push({
+                        name: data.customerName || "Khách vãng lai",
+                        email: data.customerEmail,
+                        date: data.createdAt ? (data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString('vi-VN') : "N/A") : "Đã mua hàng"
+                    });
+                }
+            });
+        }
+
+        // 3. Nếu rỗng không có ai
+        if(members.length === 0) {
+            listContainer.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 50px; margin-bottom: 15px;">📭</div>
+                    <p style="color: #e74c3c; font-weight: bold; font-size: 16px;">Chưa có dữ liệu thành viên hoặc khách hàng nào!</p>
+                </div>`;
+            return;
+        }
+
+        // 4. Vẽ bảng danh sách tuyệt đẹp
+        let html = `
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+                <thead>
+                    <tr style="background-color: #6f42c1; color: white;">
+                        <th style="padding: 15px 12px; text-align: center; border: 1px solid #5a32a3; width: 50px;">STT</th>
+                        <th style="padding: 15px 12px; text-align: left; border: 1px solid #5a32a3;">Họ và Tên</th>
+                        <th style="padding: 15px 12px; text-align: left; border: 1px solid #5a32a3;">Email liên hệ</th>
+                        <th style="padding: 15px 12px; text-align: center; border: 1px solid #5a32a3;">Ngày tham gia / Mua hàng</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        members.forEach((m, i) => {
+            html += `
+                <tr style="background-color: ${i % 2 === 0 ? '#fcfcfc' : '#fff'}; transition: 0.2s; border-bottom: 1px solid #eee;" onmouseover="this.style.backgroundColor='#f1f8ff'" onmouseout="this.style.backgroundColor='${i % 2 === 0 ? '#fcfcfc' : '#fff'}'">
+                    <td style="padding: 12px; border-right: 1px solid #eee; border-left: 1px solid #eee; text-align: center; color: #666; font-weight: bold;">${i + 1}</td>
+                    <td style="padding: 12px; border-right: 1px solid #eee; font-weight: bold; color: #333;">👤 ${m.name}</td>
+                    <td style="padding: 12px; border-right: 1px solid #eee; color: #007bff;">✉️ ${m.email}</td>
+                    <td style="padding: 12px; border-right: 1px solid #eee; text-align: center; color: #28a745; font-weight: bold;">${m.date}</td>
+                </tr>
+            `;
+        });
+
+        html += `</tbody></table>`;
+        listContainer.innerHTML = html;
+
+    } catch (error) {
+        console.error("Lỗi lấy danh sách thành viên:", error);
+        listContainer.innerHTML = '<p style="text-align: center; color: red; font-weight: bold;">❌ Lỗi kết nối máy chủ dữ liệu. Vui lòng thử lại sau.</p>';
+    }
+};
+// ==========================================
+// TÍNH NĂNG: ĐĂNG NHẬP BẰNG FACEBOOK
+// ==========================================
+window.loginWithFacebook = function() {
+    // Gọi cửa sổ đăng nhập của Facebook
+    const provider = new firebase.auth.FacebookAuthProvider();
+    
+    // Mở popup đăng nhập
+    firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+            // Lấy thông tin người dùng trả về
+            const user = result.user;
+            
+            // Thông báo thành công
+            alert("Chào mừng " + user.displayName + " đã đăng nhập thành công!");
+            
+            // Ẩn bảng đăng nhập đi (bạn nhớ sửa id 'loginModal' thành ID thực tế của bảng đăng nhập web bạn nhé)
+            const loginModal = document.getElementById('loginModal');
+            if(loginModal) loginModal.style.display = 'none';
+
+            // Có thể thêm code đổi tên "Xin chào, Lỗ Thị Hà Trang" góc phải màn hình ở đây
+            const userGreeting = document.querySelector('.user-greeting'); // Tùy class HTML của bạn
+            if(userGreeting) userGreeting.innerText = "Xin chào, " + user.displayName;
+            
+            // Tải lại trang để áp dụng trạng thái đăng nhập
+            // window.location.reload(); 
+        })
+        .catch((error) => {
+            console.error("Lỗi đăng nhập Facebook:", error);
+            if (error.code === 'auth/account-exists-with-different-credential') {
+                alert("Email Facebook này đã được đăng ký bằng phương thức khác (như Google/Mật khẩu).");
+            } else {
+                alert("Đăng nhập thất bại: " + error.message);
+            }
+        });
+};
