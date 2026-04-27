@@ -1367,12 +1367,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         return dbPub.includes(searchCore) || searchCore.includes(dbPub);
                     });
                 } 
-                else if (categoryParam) {
+               else if (categoryParam) {
                     let searchCat = categoryParam.toUpperCase().trim();
-                    window.allBooks = window.allBooks.filter(book => {
-                        if(!book.category) return false;
-                        return book.category.toUpperCase().includes(searchCat) || searchCat.includes(book.category.toUpperCase());
-                    });
+                    // NẾU TÌM "ALL" THÌ GIỮ NGUYÊN KHO SÁCH (KHÔNG LỌC)
+                    if (searchCat !== 'ALL') {
+                        window.allBooks = window.allBooks.filter(book => {
+                            if(!book.category) return false;
+                            return book.category.toUpperCase().includes(searchCat) || searchCat.includes(book.category.toUpperCase());
+                        });
+                    }
                 }
                 else if (searchParam) {
                     let keyword = searchParam.toLowerCase().trim();
@@ -1392,7 +1395,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     const titleEl = document.querySelector('.section-title h2') || document.querySelector('h2') || document.querySelector('h3');
                     if (titleEl) {
                         if (publisherParam) titleEl.innerText = "SÁCH CỦA NXB: " + publisherParam.toUpperCase();
-                        if (categoryParam) titleEl.innerText = "THỂ LOẠI: " + categoryParam.toUpperCase();
+                        if (categoryParam) {
+                            if (categoryParam.toUpperCase() === 'ALL') titleEl.innerText = "TẤT CẢ SẢN PHẨM";
+                            else titleEl.innerText = "THỂ LOẠI: " + categoryParam.toUpperCase();
+                        }
                         if (searchParam) titleEl.innerText = "KẾT QUẢ TÌM KIẾM: '" + searchParam + "'";
                     }
                     
@@ -1534,4 +1540,46 @@ window.loginWithFacebook = function() {
                 alert("Đăng nhập thất bại: " + error.message);
             }
         });
+};
+// ==========================================
+// TÍNH NĂNG: QUẢN LÝ TRANG TRỢ GIÚP & TIN TỨC (CÓ CKEDITOR)
+// ==========================================
+window.loadAdminHelp = function() {
+    db.collection('settings').doc('helpPage').get().then(doc => {
+        if(doc.exists && doc.data().content) {
+            CKEDITOR.instances['admin-help-content'].setData(doc.data().content);
+        } else {
+            CKEDITOR.instances['admin-help-content'].setData('');
+        }
+    }).catch(err => console.log('Lỗi tải trợ giúp:', err));
+};
+
+window.saveAdminHelp = function() {
+    let content = CKEDITOR.instances['admin-help-content'].getData();
+    db.collection('settings').doc('helpPage').set({ content: content }, { merge: true })
+    .then(() => {
+        alert('Đã lưu trang Trợ giúp thành công!');
+        document.getElementById('manageHelpModal').style.display='none';
+        document.getElementById('adminHubModal').style.display='block';
+    }).catch(err => alert('Lỗi: ' + err.message));
+};
+
+window.loadAdminNews = function() {
+    db.collection('settings').doc('newsPage').get().then(doc => {
+        if(doc.exists && doc.data().content) {
+            CKEDITOR.instances['admin-news-content'].setData(doc.data().content);
+        } else {
+            CKEDITOR.instances['admin-news-content'].setData('');
+        }
+    }).catch(err => console.log('Lỗi tải tin tức:', err));
+};
+
+window.saveAdminNews = function() {
+    let content = CKEDITOR.instances['admin-news-content'].getData();
+    db.collection('settings').doc('newsPage').set({ content: content }, { merge: true })
+    .then(() => {
+        alert('Đã lưu trang Tin tức thành công!');
+        document.getElementById('manageNewsModal').style.display='none';
+        document.getElementById('adminHubModal').style.display='block';
+    }).catch(err => alert('Lỗi: ' + err.message));
 };

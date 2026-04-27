@@ -7,11 +7,24 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="top-auth-bar" style="background: #0b4036; border-bottom: 1px solid #09332b; padding: 6px 0;">
-        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; padding: 0 20px; gap: 20px; font-size: 13px;">
-            <span id="user-greeting" style="display: none; color: #fff; font-weight: bold;"></span>
-            <a href="#" id="btn-show-login" onclick="document.getElementById('authModal').style.display='block'; showLoginForm(); return false;" style="color: #ddd; text-decoration: none;">👤 Đăng nhập / Đăng ký</a>
-            <a href="#" id="btn-logout" onclick="logoutUser()" style="display: none; color: #ddd; text-decoration: none;">Đăng xuất</a>
+    <div id="top-auth-bar" style="background: #f1f1f1; border-bottom: 1px solid #e5e5e5; padding: 8px 0; font-family: Arial, sans-serif;">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 13px;">
+            <div style="display: flex; gap: 25px;">
+                <a href="help.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">ⓘ Giới thiệu</a>
+                <a href="news.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">📰 Tin tức</a>
+            </div>
+            
+            <div style="display: flex; gap: 20px; align-items: center;">
+                
+                <span id="user-greeting" style="display: none; color: #105b4d; font-weight: bold;"></span>
+                
+                <span id="btn-show-login" style="display: inline-flex; gap: 20px;">
+                    <a href="#" onclick="document.getElementById('authModal').style.display='block'; showLoginForm(); return false;" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">➡️ Đăng nhập</a>
+                    <a href="#" onclick="document.getElementById('authModal').style.display='block'; showRegisterForm(); return false;" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">👤 Đăng ký</a>
+                </span>
+                
+                <a href="#" id="btn-logout" onclick="logoutUser()" style="display: none; color: #d0021b; text-decoration: none; font-weight: bold;">Đăng xuất</a>
+            </div>
         </div>
     </div>
 
@@ -377,12 +390,8 @@
                 <p style="margin: 0;">Địa chỉ: Trường Đại học Hải Phòng</p>
             </div>
             <div>
-                <h4 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase;">Trợ giúp</h4>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Hướng dẫn mua hàng</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Phương thức thanh toán</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Phương thức vận chuyển</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Chính sách đổi - trả</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Câu hỏi thường gặp (FAQs)</a>
+                <h4 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase;">Giới thiệu</h4>
+                <p style="margin: 0;">TYTBOOKS là nền tảng mua sắm trực tuyến uy tín, cung cấp đa dạng sản phẩm sách và văn phòng phẩm chất lượng cao.</p>
             </div>
             <div>
                 <h4 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase;">Tài khoản của bạn</h4>
@@ -428,7 +437,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="shop-logic.js?v=5"></script>
+   <script src="shop-logic.js" defer></script>
 
     <div id="addBookModal" class="modal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto;">
         <div class="modal-content" style="background: #fff; margin: 3% auto; padding: 30px; width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative;">
@@ -730,6 +739,17 @@
                     <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Quản Lý Flash Sale</h3>
                     <p style="font-size: 13px; color: #777; margin: 0;">Thêm sách và cài % giảm giá</p>
                 </div>
+                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('manageHelpModal').style.display='block'; loadAdminHelp();">
+                    <div style="font-size: 45px; margin-bottom: 15px;">ℹ️</div>
+                    <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Sửa Trang Giới Thiệu</h3>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Viết nội dung cho trang giới thiệu</p>
+                </div>
+                
+                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('manageNewsModal').style.display='block'; loadAdminNews();">
+                    <div style="font-size: 45px; margin-bottom: 15px;">📰</div>
+                    <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Sửa Trang Tin Tức</h3>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Viết nội dung cho trang tin tức</p>
+                </div>
             </div>
         </div>
     </div>
@@ -943,73 +963,16 @@
             </button>
         </div>
     </div>
-    <div id="floating-contact-container" style="position: fixed; bottom: 30px; right: 30px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; gap: 15px;">
-        
-        <div id="contact-menu" style="display: none; background: #fff; border-radius: 12px; box-shadow: 0 5px 25px rgba(0,0,0,0.18); overflow: hidden; width: 290px; flex-direction: column; border: 1px solid #eee; animation: fadeContactMenu 0.3s ease-out; transform-origin: bottom right;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px 10px; border-bottom: 1px solid #f1f1f1;">
-                <h4 style="margin: 0; color: #105b4d; font-size: 15px; text-transform: uppercase;">Liên hệ với TYTBOOKS</h4>
-                <span onclick="toggleContactMenu()" style="cursor: pointer; font-size: 24px; color: #aaa; line-height: 1;">&times;</span>
-            </div>
-            
-            <a href="tel:0866643XXX" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; border-bottom: 1px solid #f9f9f9; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
-                <div class="contact-icon-circle" style="background: #e74c3c; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(231,76,60,0.3);">
-                    <svg class="svg-shake" style="width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24"><path d="M20 22.62a3.3 3.3 0 0 1-2.32-.97l-2.07-2.07a11.51 11.51 0 0 1-3.61-2 11.39 11.39 0 0 1-2-3.62l-2.06-2.06a3.29 3.29 0 0 1-.01-4.63L9.67 5.56a3.29 3.29 0 0 1 4.64 0l1.29 1.29a2 2 0 0 1 0 2.82l-1.06 1.06a1.5 1.5 0 0 0-.44 1.06 1.48 1.48 0 0 0 .44 1.06 6 6 0 0 0 4.24 4.24 1.48 1.48 0 0 0 1.06-.44l1.06-1.06a2 2 0 0 1 2.83 0l1.29 1.29a3.3 3.3 0 0 1 .01 4.63l-1.74 1.74a3.3 3.3 0 0 1-2.33.98z"/></svg>
-                </div>
-                <div style="flex: 1;">
-                    <div style="font-size: 14px; font-weight: bold; color: #e74c3c; margin-bottom: 2px;">Hotline 24/7</div>
-                    <div style="font-size: 13px; color: #666;">Gọi ngay: 0866.643.XXX</div>
-                </div>
-            </a>
-            
-            <a href="https://zalo.me/0866643XXX" target="_blank" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; border-bottom: 1px solid #f9f9f9; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
-                <div class="contact-icon-circle" style="background: #0088cc; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(0,136,204,0.3);">
-                    <svg style="width: 20px; height: 20px; fill: white;" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.146 2 11.26c0 2.91 1.446 5.5 3.705 7.158V22l3.41-1.87a11.233 11.233 0 0 0 2.885.372c5.523 0 10-4.146 10-9.262S17.523 2 12 2zm1.611 11.916l-2.484-2.656-4.836 2.656 5.319-5.642 2.553 2.656 4.767-2.656-5.319 5.642z"/></svg>
-                </div>
-                <div style="flex: 1;">
-                    <div style="font-size: 14px; font-weight: bold; color: #0088cc; margin-bottom: 2px;">Chat Zalo</div>
-                    <div style="font-size: 13px; color: #666;">Hỗ trợ khách hàng qua Zalo</div>
-                </div>
-            </a>
-            
-            <a href="#" style="display: flex; align-items: center; gap: 15px; padding: 15px 20px; text-decoration: none; color: #333; transition: 0.2s;" onmouseover="this.style.background='#fcfcfc'; this.querySelector('.contact-icon-circle').style.transform='scale(1.1)';" onmouseout="this.style.background='transparent'; this.querySelector('.contact-icon-circle').style.transform='scale(1)';">
-                <div class="contact-icon-circle" style="background: #1abc9c; color: white; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: 0.3s; box-shadow: 0 3px 8px rgba(26,188,156,0.3);">
-                    <svg style="width: 18px; height: 18px; fill: white;" viewBox="0 0 24 24"><path d="M22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6zm-2 0l-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"/></svg>
-                </div>
-                <div style="flex: 1;">
-                    <div style="font-size: 14px; font-weight: bold; color: #1abc9c; margin-bottom: 2px;">Gửi Yêu Cầu</div>
-                    <div style="font-size: 13px; color: #666;">Đăng kí thông tin hoặc lời nhắn</div>
-                </div>
-            </a>
-        </div>
-
-        <div style="position: relative; width: 56px; height: 56px;">
-            <div style="position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; background: rgba(16, 91, 77, 0.3); border-radius: 50%; animation: pulseContact 2s infinite; z-index: 1;"></div>
-            
-            <button id="btn-toggle-contact" onclick="toggleContactMenu()" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background: #105b4d; color: white; border: none; box-shadow: 0 4px 10px rgba(16,91,77,0.4); cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.3s; outline: none; z-index: 2;">
-                <div id="contact-icons-wrap" style="position: relative; width: 28px; height: 28px; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
-                    <svg class="contact-icon-active" style="width: 28px; height: 28px; fill: white; position: absolute; top: 0; left: 0; transition: 0.3s;" viewBox="0 0 24 24">
-                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.2L4 17.2V4h16v12z"/>
-                    </svg>
-                    <svg class="contact-icon-close" style="width: 28px; height: 28px; fill: white; position: absolute; top: 0; left: 0; opacity: 0; transform: scale(0.5) rotate(-90deg); transition: 0.3s;" viewBox="0 0 24 24">
-                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/>
-                    </svg>
-                </div>
-            </button>
-        </div>
-    </div>
-
+    
     <style>
-        /* Animation lan tỏa vòng tròn */
         @keyframes pulseContact { 
             0% { transform: scale(0.85); opacity: 1; } 
             100% { transform: scale(1.3); opacity: 0; } 
         }
-        /* Animation hiện menu */
         @keyframes fadeContactMenu { 
             from { opacity: 0; transform: scale(0.8) translateY(20px); } 
             to { opacity: 1; transform: scale(1) translateY(0); } 
         }
-        /* Animation rung chuông điện thoại */
         .contact-icon-circle:hover .svg-shake { animation: phoneShake 0.5s infinite; }
         @keyframes phoneShake { 
             0% { transform: rotate(0); } 
@@ -1028,18 +991,14 @@
             const iconClose = iconsWrap.querySelector('.contact-icon-close');
             
             if (menu.style.display === 'none' || menu.style.display === '') {
-                // Hiển thị menu
                 menu.style.display = 'flex';
-                // Xoay 180 độ, làm mờ icon chat, phóng to icon X
                 iconsWrap.style.transform = 'rotate(180deg)';
                 iconActive.style.opacity = '0';
                 iconActive.style.transform = 'scale(0.5)';
                 iconClose.style.opacity = '1';
                 iconClose.style.transform = 'scale(1) rotate(90deg)';
             } else {
-                // Ẩn menu
                 menu.style.display = 'none';
-                // Trả icon về như cũ
                 iconsWrap.style.transform = 'rotate(0deg)';
                 iconActive.style.opacity = '1';
                 iconActive.style.transform = 'scale(1)';
@@ -1161,5 +1120,83 @@
             
         </div>
     </div>
+    <div id="manageHelpModal" class="modal" style="display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);">
+        <div class="modal-content" style="background: #fff; margin: 2% auto; padding: 25px; width: 800px; border-radius: 8px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button type="button" onclick="document.getElementById('manageHelpModal').style.display='none'; document.getElementById('adminHubModal').style.display='block';" style="background: #f1f1f1; border: 1px solid #ccc; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; color: #333;">⬅ Quay lại Admin</button>
+                    <h2 style="color: #105b4d; margin: 0;">ℹ️ Cập nhật Trang Trợ Giúp</h2>
+                </div>
+                <span onclick="document.getElementById('manageHelpModal').style.display='none'" style="cursor: pointer; font-size: 28px; color: #888;">&times;</span>
+            </div>
+            <p style="font-size: 13px; color: #666; font-style: italic;">Bạn có thể nhập văn bản hoặc chèn mã HTML vào đây để tạo giao diện tùy ý.</p>
+            <textarea id="admin-help-content" rows="15" style="width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: monospace; font-size: 14px; line-height: 1.5; margin-bottom: 15px;" placeholder="Nhập nội dung trang Giới thiệu..."></textarea>
+            <button onclick="saveAdminHelp()" style="width: 100%; background: #28a745; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">LƯU TRANG TRỢ GIÚP</button>
+        </div>
+    </div>
+
+    <div id="manageNewsModal" class="modal" style="display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6);">
+        <div class="modal-content" style="background: #fff; margin: 2% auto; padding: 25px; width: 800px; border-radius: 8px; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button type="button" onclick="document.getElementById('manageNewsModal').style.display='none'; document.getElementById('adminHubModal').style.display='block';" style="background: #f1f1f1; border: 1px solid #ccc; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; color: #333;">⬅ Quay lại Admin</button>
+                    <h2 style="color: #105b4d; margin: 0;">📰 Cập nhật Trang Tin Tức</h2>
+                </div>
+                <span onclick="document.getElementById('manageNewsModal').style.display='none'" style="cursor: pointer; font-size: 28px; color: #888;">&times;</span>
+            </div>
+            <p style="font-size: 13px; color: #666; font-style: italic;">Bạn có thể nhập văn bản hoặc chèn mã HTML (ảnh, video, link) vào đây.</p>
+            <textarea id="admin-news-content" rows="15" style="width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-family: monospace; font-size: 14px; line-height: 1.5; margin-bottom: 15px;" placeholder="Nhập nội dung trang Tin tức..."></textarea>
+            <button onclick="saveAdminNews()" style="width: 100%; background: #28a745; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer;">LƯU TRANG TIN TỨC</button>
+        </div>
+    </div>
+
+    <script>
+        function loadAdminHelp() {
+            db.collection('settings').doc('helpPage').get().then(doc => {
+                if(doc.exists && doc.data().content) {
+                    document.getElementById('admin-help-content').value = doc.data().content;
+                } else {
+                    document.getElementById('admin-help-content').value = '';
+                }
+            }).catch(err => console.log('Lỗi tải trợ giúp:', err));
+        }
+
+        function saveAdminHelp() {
+            let content = document.getElementById('admin-help-content').value;
+            db.collection('settings').doc('helpPage').set({ content: content }, { merge: true })
+            .then(() => {
+                alert('Đã lưu trang Giới thiệu thành công!');
+                document.getElementById('manageHelpModal').style.display='none';
+                document.getElementById('adminHubModal').style.display='block';
+            }).catch(err => alert('Lỗi: ' + err.message));
+        }
+
+        function loadAdminNews() {
+            db.collection('settings').doc('newsPage').get().then(doc => {
+                if(doc.exists && doc.data().content) {
+                    document.getElementById('admin-news-content').value = doc.data().content;
+                } else {
+                    document.getElementById('admin-news-content').value = '';
+                }
+            }).catch(err => console.log('Lỗi tải tin tức:', err));
+        }
+
+        function saveAdminNews() {
+            let content = document.getElementById('admin-news-content').value;
+            db.collection('settings').doc('newsPage').set({ content: content }, { merge: true })
+            .then(() => {
+                alert('Đã lưu trang Tin tức thành công!');
+                document.getElementById('manageNewsModal').style.display='none';
+                document.getElementById('adminHubModal').style.display='block';
+            }).catch(err => alert('Lỗi: ' + err.message));
+        }
+    </script>
+    <script src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js"></script>
+    
+    <script>
+        CKEDITOR.config.versionCheck = false;
+        CKEDITOR.replace('admin-help-content', { allowedContent: true });
+        CKEDITOR.replace('admin-news-content', { allowedContent: true });
+    </script>
 </body>
 </html>

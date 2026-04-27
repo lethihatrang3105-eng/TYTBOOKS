@@ -8,12 +8,25 @@
 </head>
 <body style="background-color: #f4f6f9;">
 
-    <div id="top-auth-bar" style="background: #0b4036; border-bottom: 1px solid #09332b; padding: 6px 0;">
-        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: flex-end; padding: 0 20px; gap: 20px; font-size: 13px;">
-            <span id="user-greeting" style="display: none; color: #fff; font-weight: bold;"></span>
-            <a href="#" id="btn-show-login" onclick="document.getElementById('authModal').style.display='block'; showLoginForm(); return false;" style="color: #ddd; text-decoration: none;">👤 Đăng nhập / Đăng ký</a>
-            <a href="#" id="btn-logout" onclick="logoutUser()" style="display: none; color: #ddd; text-decoration: none;">Đăng xuất</a>
+  <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 13px;">
+        
+        <div style="display: flex; gap: 25px;">
+            <a href="help.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">ⓘ Trợ giúp</a>
+            <a href="news.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">📰 Tin tức</a>
         </div>
+        
+        <div style="display: flex; gap: 20px; align-items: center;">
+                
+                <span id="user-greeting" style="display: none; color: #105b4d; font-weight: bold;"></span>
+                
+                <span id="btn-show-login" style="display: inline-flex; gap: 20px;">
+                    <a href="#" onclick="document.getElementById('authModal').style.display='block'; showLoginForm(); return false;" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">➡️ Đăng nhập</a>
+                    <a href="#" onclick="document.getElementById('authModal').style.display='block'; showRegisterForm(); return false;" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">👤 Đăng ký</a>
+                </span>
+                
+                <a href="#" id="btn-logout" onclick="logoutUser()" style="display: none; color: #d0021b; text-decoration: none; font-weight: bold;">Đăng xuất</a>
+        </div>
+
     </div>
 
     <header class="header" style="background: #105b4d; padding: 15px 0;">
@@ -284,7 +297,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="shop-logic.js?v=6"></script>
+    <script src="shop-logic.js" defer></script>
 
     <div id="addBookModal" class="modal" style="display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto;">
         <div class="modal-content" style="background: #fff; margin: 3% auto; padding: 30px; width: 800px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative;">
@@ -559,10 +572,10 @@
                     <p style="font-size: 13px; color: #777; margin: 0;">Xem, duyệt và xử lý đơn đặt hàng</p>
                 </div>
 
-                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; alert('Mẹo: Bạn hãy quay về màn hình TRANG CHỦ để sử dụng tính năng Cấu hình Banner nhé, vì banner chỉ chạy ở trang chủ thôi!');">
+                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('bannerModal').style.display='block';">
                     <div style="font-size: 45px; margin-bottom: 15px;">🖼️</div>
                     <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Cấu Hình Banner</h3>
-                    <p style="font-size: 13px; color: #777; margin: 0;">Chỉnh sửa ảnh banner chạy</p>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Đổi ảnh quảng cáo tự chạy ở trang chủ</p>
                 </div>
 
                 <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; openStatsManager();">
@@ -570,7 +583,7 @@
                     <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Báo Cáo Thống Kê</h3> 
                 </div>
                 
-                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; alert('Tính năng đang phát triển: Hệ thống đang kết nối danh sách Firebase Auth...');">
+                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; openMemberManager();">
                     <div style="font-size: 45px; margin-bottom: 15px;">👥</div>
                     <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Quản Lý Thành Viên</h3>
                     <p style="font-size: 13px; color: #777; margin: 0;">Xem danh sách khách hàng đã đăng ký</p>
@@ -580,6 +593,17 @@
                     <div style="font-size: 45px; margin-bottom: 15px;">⚡</div>
                     <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Quản Lý Flash Sale</h3>
                     <p style="font-size: 13px; color: #777; margin: 0;">Thêm sách và cài % giảm giá</p>
+                </div>
+                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('manageHelpModal').style.display='block'; loadAdminHelp();">
+                    <div style="font-size: 45px; margin-bottom: 15px;">ℹ️</div>
+                    <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Sửa Trang Trợ Giúp</h3>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Viết nội dung cho trang trợ giúp</p>
+                </div>
+                
+                <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('manageNewsModal').style.display='block'; loadAdminNews();">
+                    <div style="font-size: 45px; margin-bottom: 15px;">📰</div>
+                    <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Sửa Trang Tin Tức</h3>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Viết nội dung cho trang tin tức</p>
                 </div>
             </div>
         </div>
