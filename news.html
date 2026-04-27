@@ -6,93 +6,285 @@
     <title>Tin Tức - TYTBOOKS</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa;">
     <div id="top-auth-bar" style="background: #f1f1f1; border-bottom: 1px solid #e5e5e5; padding: 8px 0; font-family: Arial, sans-serif;">
         <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 13px;">
             <div style="display: flex; gap: 25px;">
-                <a href="help.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">ⓘ Trợ giúp</a>
-                <a href="news.html" style="color: #105b4d; font-weight: bold; text-decoration: none; display: flex; align-items: center; gap: 5px;">📰 Tin tức</a>
+                <a href="help.html" style="color: #555; text-decoration: none;">ⓘ Giới thiệu</a>
+                <a href="news.html" style="color: #105b4d; font-weight: bold; text-decoration: none;">📰 Tin tức</a>
             </div>
             <div style="display: flex; gap: 20px; align-items: center;">
-                <a href="index.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#105b4d'" onmouseout="this.style.color='#555'">🏠 Quay về Trang chủ</a>
+                <a href="index.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px;">🏠 Quay về Trang chủ</a>
             </div>
         </div>
     </div>
 
-    <header class="header" style="background: #105b4d; padding: 15px 0;">
+    <header class="header" style="background: #105b4d; padding: 15px 0; font-family: Arial, sans-serif;">
         <div class="header-container" style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
             <div class="logo">
                 <h1 style="margin: 0; color: #fff;"><a href="index.html" style="text-decoration: none; color: inherit;">TYTBOOKS</a></h1>
             </div>
             <div class="search-bar" style="flex: 1; margin: 0 50px;">
-                <div style="display: flex; border: 2px solid #fff; border-radius: 4px; overflow: hidden; max-width: 600px; margin: auto; background: #fff;">
+                <div style="display: flex; border: 2px solid #fff; border-radius: 4px; overflow: hidden; max-width: 600px; background: #fff;">
                     <input type="text" placeholder="Tìm tin tức bạn quan tâm..." style="width: 100%; padding: 10px 15px; border: none; outline: none; font-size: 14px;">
-                    <button style="padding: 10px 25px; background-color: #0b4036; border: none; cursor: pointer; color: #fff; font-weight: bold; font-size: 16px;">🔍</button>
+                    <button style="padding: 10px 25px; background-color: #0b4036; border: none; cursor: pointer; color: #fff; font-weight: bold;">🔍</button>
                 </div>
             </div>
-            <div class="user-actions" style="display: flex; align-items: center; gap: 30px;">
-                <div style="display: flex; align-items: center; gap: 10px; color: #fff;">
-                    <span style="font-size: 28px;">🎧</span>
-                    <div>
-                        <div style="font-weight: bold; font-size: 16px;">0866 643 XXX</div>
-                        <div style="font-size: 12px; color: #ddd;">Hot line</div>
-                    </div>
+            <div class="user-actions" style="display: flex; align-items: center; gap: 15px; color: #fff;">
+                <span style="font-size: 28px;">🎧</span>
+                <div>
+                    <div style="font-weight: bold; font-size: 16px;">0866 643 XXX</div>
+                    <div style="font-size: 12px; color: #ddd;">Hot line</div>
                 </div>
             </div>
         </div>
     </header>
 
-    <main class="main-content" style="background-color: #fff; padding: 40px 0; min-height: 50vh;">
-        <div id="news-dynamic-content" style="max-width: 1200px; margin: 0 auto; padding: 0 20px; color: #333; line-height: 1.6;">
-            <div style="text-align: center; padding: 50px 0; color: #999; font-style: italic;">
-                Đang tải nội dung...
+    <main class="main-content" style="padding: 40px 0; min-height: 60vh;">
+        <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+            <h2 style="color: #105b4d; border-bottom: 2px solid #105b4d; padding-bottom: 10px; margin-bottom: 30px; font-family: Arial, sans-serif;">Bản Tin TYTBOOKS</h2>
+            
+            <div id="news-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+                <div style="text-align: center; grid-column: 1 / -1; color: #999; font-style: italic; font-family: Arial, sans-serif;">Đang tải tin tức từ hệ thống...</div>
             </div>
         </div>
     </main>
 
-    <footer style="background-color: #f8f9fa; border-top: 1px solid #eaeaea; color: #333; font-family: Arial, sans-serif;">
-        <div style="background-color: #222; color: #aaa; text-align: center; padding: 15px 0; font-size: 13px;">
-            <p style="margin: 0;">© 2026 TYTBOOKS. Nhà sách trực tuyến của sinh viên Lớp Công nghệ thông tin 2.K24 - Đại học Hải Phòng.</p>
-            <p style="margin: 5px 0 0 0;">Thiết kế bởi Nhóm 9.</p>
-        </div>
+    <footer style="background-color: #222; color: #aaa; text-align: center; padding: 20px 0; font-size: 13px; font-family: Arial, sans-serif;">
+        <p style="margin: 0 0 5px 0;">© 2026 TYTBOOKS. Nhà sách trực tuyến của sinh viên Lớp Công nghệ thông tin 2.K24 - Đại học Hải Phòng.</p>
+        <p style="margin: 0;">Thiết kế bởi Nhóm 9.</p>
     </footer>
-    
-  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+
+    <div id="newsDetailModal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto;">
+        <div class="modal-content" style="background: #fff; margin: 5% auto; width: 800px; max-width: 90%; border-radius: 8px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+            <span onclick="document.getElementById('newsDetailModal').style.display='none'" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 32px; color: #888; z-index: 10; transition: 0.2s;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">&times;</span>
+            
+            <div style="padding: 40px 30px;">
+                <h2 id="detail-modal-title" style="color: #105b4d; margin-top: 0; font-size: 24px; line-height: 1.4;">Đang tải...</h2>
+                <div id="detail-modal-date" style="font-size: 13px; color: #888; border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 20px;"></div>
+                
+                <div id="detail-modal-summary" style="font-weight: bold; font-style: italic; color: #444; margin-bottom: 20px; font-size: 16px; line-height: 1.6;"></div>
+                
+                <img id="detail-modal-img" src="" style="width: 100%; max-height: 400px; object-fit: contain; border-radius: 4px; margin-bottom: 25px; display: none; background: #f9f9f9;">
+                
+                <div id="detail-modal-content" style="line-height: 1.8; color: #333; font-size: 16px; white-space: pre-wrap;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="editNewsModal" class="modal" style="display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); overflow-y: auto;">
+        <div class="modal-content" style="background: #fff; margin: 5% auto; padding: 25px; width: 800px; max-width: 90%; border-radius: 8px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); font-family: Arial, sans-serif;">
+            <span onclick="document.getElementById('editNewsModal').style.display='none'" style="position: absolute; right: 20px; top: 15px; cursor: pointer; font-size: 32px; color: #888; transition: 0.2s;" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='#888'">&times;</span>
+            <h2 style="color: #d39e00; margin-top: 0; border-bottom: 2px solid #d39e00; padding-bottom: 10px; margin-bottom: 20px;">Sửa Nội Dung Tin Tức</h2>
+            
+            <input type="hidden" id="edit-news-id">
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tiêu đề bài viết <span style="color: red;">*</span></label>
+                    <input type="text" id="edit-news-title" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Link ảnh đại diện</label>
+                    <input type="text" id="edit-news-thumb" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Mô tả ngắn</label>
+                    <textarea id="edit-news-summary" rows="3" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
+                </div>
+                <div>
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Nội dung chi tiết <span style="color: red;">*</span></label>
+                    <textarea id="edit-news-content" rows="8" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;"></textarea>
+                </div>
+                
+                <button onclick="saveEditNews()" style="width: 100%; background: #28a745; color: white; border: none; padding: 14px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 16px; transition: 0.2s;" onmouseover="this.style.background='#218838'" onmouseout="this.style.background='#28a745'">LƯU THAY ĐỔI</button>
+                <div id="edit-news-message" style="text-align: center; margin-top: 5px; font-weight: bold;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
     <script src="shop-logic.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const container = document.getElementById('help-dynamic-content');
-            if (!container) return;
+        // Mảng chứa dữ liệu tạm thời
+        window.loadedNewsData = [];
 
+        document.addEventListener("DOMContentLoaded", function() {
+            const newsList = document.getElementById('news-list');
+            let isUserAdmin = false;
+
+            // Chờ Firebase kết nối
             let checkDB = setInterval(() => {
-                if (typeof db !== 'undefined') {
-                    clearInterval(checkDB); 
+                if (typeof firebase !== 'undefined' && typeof db !== 'undefined') {
+                    clearInterval(checkDB);
                     
-                    db.collection('settings').doc('helpPage').get()
-                    .then(doc => {
-                        if(doc.exists && doc.data().content) {
-                            let rawContent = doc.data().content;
-                            
-                            // Tạo textarea ảo để giải mã các ký tự &lt; thành dấu <
-                            let txt = document.createElement("textarea");
-                            txt.innerHTML = rawContent;
-                            
-                            // In ra màn hình
-                            container.innerHTML = txt.value;
+                    // Phân quyền: Ai đang xem trang này?
+                    firebase.auth().onAuthStateChanged(function(user) {
+                        if (user && user.email === 'lethihatrang3105@gmail.com') {
+                            isUserAdmin = true;
                         } else {
-                            container.innerHTML = '<p style="text-align:center;">Nội dung đang được cập nhật...</p>';
+                            isUserAdmin = false;
                         }
-                    })
-                    .catch(err => {
-                        console.error("Lỗi lấy dữ liệu:", err);
-                        container.innerHTML = '<p style="text-align:center; color:red;">Lỗi kết nối dữ liệu!</p>';
+                        // Bắt đầu tải dữ liệu sau khi kiểm tra xong
+                        loadNewsData(isUserAdmin);
                     });
                 }
             }, 300);
+
+            function loadNewsData(isAdmin) {
+                db.collection('news').orderBy('createdAt', 'desc').get()
+                .then(snapshot => {
+                    if (snapshot.empty) {
+                        newsList.innerHTML = '<p style="text-align:center; grid-column: 1 / -1;">Hiện chưa có bản tin nào.</p>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    window.loadedNewsData = []; 
+                    let index = 0;
+
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
+                        data.id = doc.id; 
+                        window.loadedNewsData.push(data); // Lưu vào mảng để Popup dùng được
+
+                        // Nút Admin
+                        let adminButtonsHTML = '';
+                        if (isAdmin) {
+                            adminButtonsHTML = `
+                                <button onclick="editNews(${index})" style="background: #ffc107; color: #333; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">Sửa</button>
+                                <button onclick="deleteNews('${data.id}')" style="background: #dc3545; color: #fff; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">Xóa</button>
+                            `;
+                        }
+
+                        html += `
+                            <div style="background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: 0.3s; font-family: Arial, sans-serif;">
+                                ${data.thumbnail 
+                                    ? `<img src="${data.thumbnail}" style="width: 100%; height: 220px; object-fit: cover;">` 
+                                    : `<div style="width: 100%; height: 220px; background: #eee; display: flex; align-items: center; justify-content: center; color: #aaa;">Chưa có ảnh</div>`
+                                }
+                                <div style="padding: 20px; display: flex; flex-direction: column; flex: 1;">
+                                    <h3 style="margin: 0 0 10px 0; color: #105b4d; font-size: 18px; line-height: 1.4;">${data.title}</h3>
+                                    <p style="font-size: 14px; color: #666; margin: 0 0 15px 0; line-height: 1.6; flex: 1;">${data.summary || 'Đang cập nhật mô tả...'}</p>
+                                    
+                                    <div style="display: flex; gap: 8px; margin-top: auto;">
+                                        <button onclick="openNewsDetail(${index})" style="flex: 1; background: #105b4d; color: #fff; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.2s;">Đọc chi tiết</button>
+                                        ${adminButtonsHTML}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        index++;
+                    });
+                    newsList.innerHTML = html;
+                })
+                .catch(err => {
+                    console.error("Lỗi lấy dữ liệu:", err);
+                    newsList.innerHTML = '<p style="text-align:center; color:red; grid-column: 1 / -1;">Lỗi tải dữ liệu. Vui lòng thử lại!</p>';
+                });
+            }
         });
+
+        // ===============================================
+        // CÁC HÀM XỬ LÝ CLICK TỪ NÚT BẤM
+        // ===============================================
+
+        // Mở popup đọc báo
+        window.openNewsDetail = function(index) {
+            if (!window.loadedNewsData) return;
+            const article = window.loadedNewsData[index];
+            
+            document.getElementById('detail-modal-title').innerText = article.title;
+            
+            let dateStr = 'Đang cập nhật';
+            if (article.createdAt) {
+                let d = article.createdAt.toDate();
+                dateStr = "Đăng ngày: " + d.toLocaleDateString('vi-VN') + " lúc " + d.toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'});
+            }
+            document.getElementById('detail-modal-date').innerText = dateStr;
+
+            const summaryEl = document.getElementById('detail-modal-summary');
+            if(summaryEl) {
+                if (article.summary) {
+                    summaryEl.innerText = article.summary;
+                    summaryEl.style.display = 'block';
+                } else {
+                    summaryEl.style.display = 'none';
+                }
+            }
+
+            const imgEl = document.getElementById('detail-modal-img');
+            if (article.thumbnail) {
+                imgEl.src = article.thumbnail;
+                imgEl.style.display = 'block';
+            } else {
+                imgEl.style.display = 'none';
+            }
+
+            document.getElementById('detail-modal-content').innerText = article.content;
+            document.getElementById('newsDetailModal').style.display = 'block';
+        };
+
+        // Hàm xóa báo
+        window.deleteNews = function(id) {
+            if(confirm("Bạn có chắc chắn muốn xóa bản tin này không? Hành động này không thể khôi phục!")) {
+                db.collection('news').doc(id).delete().then(() => {
+                    alert("Đã xóa tin tức thành công!");
+                    location.reload(); 
+                }).catch(error => {
+                    alert("Lỗi khi xóa: " + error.message);
+                });
+            }
+        };
+
+        // Hàm mở popup sửa báo
+        window.editNews = function(index) {
+            if (!window.loadedNewsData) return;
+            const article = window.loadedNewsData[index];
+            
+            document.getElementById('edit-news-id').value = article.id;
+            document.getElementById('edit-news-title').value = article.title || '';
+            document.getElementById('edit-news-thumb').value = article.thumbnail || '';
+            document.getElementById('edit-news-summary').value = article.summary || '';
+            document.getElementById('edit-news-content').value = article.content || '';
+            document.getElementById('edit-news-message').innerHTML = '';
+            
+            document.getElementById('editNewsModal').style.display = 'block';
+        };
+
+        // Hàm lưu báo đã sửa lên Firebase
+        window.saveEditNews = function() {
+            const id = document.getElementById('edit-news-id').value;
+            const title = document.getElementById('edit-news-title').value.trim();
+            const thumb = document.getElementById('edit-news-thumb').value.trim();
+            const summary = document.getElementById('edit-news-summary').value.trim();
+            const content = document.getElementById('edit-news-content').value.trim();
+            const msgDiv = document.getElementById('edit-news-message');
+
+            if(!title || !content) {
+                msgDiv.innerHTML = '<span style="color: red;">Vui lòng nhập đủ Tiêu đề và Nội dung chi tiết!</span>';
+                return;
+            }
+
+            msgDiv.innerHTML = '<span style="color: blue;">Đang cập nhật lên hệ thống...</span>';
+
+            db.collection('news').doc(id).update({
+                title: title,
+                thumbnail: thumb,
+                summary: summary,
+                content: content
+            }).then(() => {
+                msgDiv.innerHTML = '<span style="color: green;">Cập nhật thành công! Đang tải lại trang...</span>';
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }).catch(error => {
+                msgDiv.innerHTML = '<span style="color: red;">Lỗi: ' + error.message + '</span>';
+            });
+        };
     </script>
 </body>
 </html>

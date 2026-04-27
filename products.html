@@ -11,7 +11,7 @@
   <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 13px;">
         
         <div style="display: flex; gap: 25px;">
-            <a href="help.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">ⓘ Trợ giúp</a>
+            <a href="help.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">ⓘ Giới thiệu</a>
             <a href="news.html" style="color: #555; text-decoration: none; display: flex; align-items: center; gap: 5px; transition: 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#ddd'">📰 Tin tức</a>
         </div>
         
@@ -103,8 +103,6 @@
                                 <a href="#" onclick="filterCategory(event, 'Chính trị - Triết học Đông Tây')">Chính trị - Triết học Đông Tây</a>
                                 <a href="#" onclick="filterCategory(event, 'Bách khoa tri thức')">Bách khoa tri thức</a>
                                 <a href="#" onclick="filterCategory(event, 'Kiến thức chuyên ngành, Khảo cứu')">Kiến thức chuyên ngành, Khảo cứu</a>
-                                <a href="#" onclick="filterCategory(event, 'Coloring Book')">Coloring Book</a>
-                                <a href="#" onclick="filterCategory(event, 'Learning Foreign Language')">Learning Foreign Language</a>
                                 <a href="#" onclick="filterCategory(event, 'Truyện tranh manga, comic')">Truyện tranh manga, comic</a>
                                 <a href="#" onclick="filterCategory(event, 'Sách')" style="font-weight: bold; margin-top: 10px;">Tất cả danh mục ></a>
                             </div>
@@ -263,12 +261,8 @@
                 <p style="margin: 0;">Địa chỉ: Trường Đại học Hải Phòng</p>
             </div>
             <div>
-                <h4 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase;">Trợ giúp</h4>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Hướng dẫn mua hàng</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Phương thức thanh toán</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Phương thức vận chuyển</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Chính sách đổi - trả</a>
-                <a href="#" style="display: block; color: #333; text-decoration: none;">Câu hỏi thường gặp (FAQs)</a>
+                <h4 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase;">Giới thiệu</h4>
+                <p style="margin: 0;">TYTBOOKS là nền tảng mua sắm trực tuyến uy tín, cung cấp đa dạng sản phẩm sách và văn phòng phẩm chất lượng cao.</p>
             </div>
             <div>
                 <h4 style="margin: 0 0 15px 0; font-size: 14px; text-transform: uppercase;">Tài khoản của bạn</h4>
@@ -313,7 +307,10 @@
                     <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tác giả</label>
                     <input type="text" id="bookAuthor" placeholder="Ví dụ: Toshikazu Kawaguchi" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
                 </div>
-                
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Số lượng nhập kho <span style="color: red;">*</span></label>
+                    <input type="number" id="book-stock" placeholder="Nhập số lượng (VD: 50)" min="0" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" required>
+                </div>
                 <div style="display: flex; gap: 15px; margin-bottom: 15px;">
                     <div class="input-group" style="flex: 1;">
                         <label style="display: block; font-weight: bold; margin-bottom: 5px;">Mã sản phẩm (Mã sách)</label>
@@ -423,7 +420,10 @@
                 <label style="display: block; font-weight: bold; margin-bottom: 5px;">Tác giả</label>
                 <input type="text" id="edit-book-author" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
             </div>
-            
+            <div class="input-group" style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; margin-bottom: 5px;">Số lượng hiện có</label>
+                <input type="number" id="edit-book-stock" placeholder="Nhập số lượng tồn kho..." style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" min="0">
+            </div>
             <div style="display: flex; gap: 15px; margin-bottom: 15px;">
                 <div class="input-group" style="flex: 1;">
                     <label style="display: block; font-weight: bold; margin-bottom: 5px;">Mã sản phẩm (Mã sách)</label>
@@ -596,8 +596,8 @@
                 </div>
                 <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('manageHelpModal').style.display='block'; loadAdminHelp();">
                     <div style="font-size: 45px; margin-bottom: 15px;">ℹ️</div>
-                    <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Sửa Trang Trợ Giúp</h3>
-                    <p style="font-size: 13px; color: #777; margin: 0;">Viết nội dung cho trang trợ giúp</p>
+                    <h3 style="margin: 0 0 5px 0; color: #333; font-size: 16px;">Sửa Trang Giới thiệu</h3>
+                    <p style="font-size: 13px; color: #777; margin: 0;">Viết nội dung cho trang giới thiệu</p>
                 </div>
                 
                 <div style="background: white; padding: 25px 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid #ddd; transition: 0.3s;" onmouseover="this.style.borderColor='#105b4d'; this.style.transform='translateY(-3px)';" onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)';" onclick="document.getElementById('adminHubModal').style.display='none'; document.getElementById('manageNewsModal').style.display='block'; loadAdminNews();">
